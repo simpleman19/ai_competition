@@ -1,16 +1,20 @@
 from model1 import compile_model
 import numpy
 import math
+import sys
 import datetime
+import matplotlib.pyplot as plt
 from load_data import load_data
 
 numpy.random.seed(7)
 
 
-def train_model(filenames, batch_size, epochs, train, samples=None):
+def train_model(filenames, batch_size, epochs, train, samples=None, uuid=None):
     model = compile_model()
     test_data = None
     test_labels = None
+    loss = []
+    acc = []
     for file in filenames:
         print('-- New File -- {}'.format(file))
         shuffled_data, shuffled_one_hot, shuffled_labels = load_data(file)
@@ -21,28 +25,50 @@ def train_model(filenames, batch_size, epochs, train, samples=None):
         for e in range(0, epochs):
             print('Epoch {}/{}'.format(e, epochs))
             for i in range(0, batches - 1):
-                loss = model.train_on_batch(shuffled_data[i*batch_size:(i+1)*batch_size, 0, :],
+                metrics = model.train_on_batch(shuffled_data[i*batch_size:(i+1)*batch_size, 0, :],
                                      shuffled_one_hot[i*batch_size:(i+1)*batch_size])
                 print('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f}'.format((i+1)*batch_size,
                                                                              train_count,
-                                                                             model.metrics_names[0], loss[0],
-                                                                             model.metrics_names[1], loss[1]))
-            loss = model.train_on_batch(shuffled_data[(batches-1) * batch_size:train_count, 0, :],
+                                                                             model.metrics_names[0], metrics[0],
+                                                                             model.metrics_names[1], metrics[1]))
+                loss.append(metrics[0])
+                acc.append(metrics[1])
+            metrics = model.train_on_batch(shuffled_data[(batches-1) * batch_size:train_count, 0, :],
                                         shuffled_one_hot[(batches-1) * batch_size:train_count])
             print('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f}'.format(train_count,
                                                                         train_count,
-                                                                        model.metrics_names[0], loss[0],
-                                                                        model.metrics_names[1], loss[1]))
+                                                                        model.metrics_names[0], metrics[0],
+                                                                        model.metrics_names[1], metrics[1]))
+            loss.append(metrics[0])
+            acc.append(metrics[1])
+
         if test_data is None:
             test_data = shuffled_data[train_count:samples, 0, :]
             test_labels = shuffled_one_hot[train_count:samples]
         else:
             test_data = numpy.concatenate([test_data, shuffled_data[train_count:samples, 0, :]])
             test_labels = numpy.concatenate([test_labels, shuffled_one_hot[train_count:samples]])
-
+    time = datetime.datetime.now()
     scores = model.evaluate(test_data, test_labels)
-    model.save('model1-{date:%Y-%m-%d %H:%M:%S}-{score}.h5'.format(date=datetime.datetime.now(), score=scores[1] * 100))
+    model.save('{}-{date:%Y-%m-%d %H:%M:%S}-{score}.h5'.format(uuid, date=time, score=scores[1] * 100))
     print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
+    plot(loss, acc, time, uuid)
+
+
+def plot(loss, acc, time, uuid):
+    plt.plot(loss)
+    plt.title('Model Loss')
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.legend(['train'], loc='upper left')
+    plt.savefig('{}-loss-{date:%Y-%m-%d %H:%M:%S}.png'.format(uuid, date=time))
+    plt.clf()
+    plt.plot(acc)
+    plt.title('Model Accuracy')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch')
+    plt.legend(['train'], loc='upper left')
+    plt.savefig('{}-acc-{date:%Y-%m-%d %H:%M:%S}.png'.format(uuid, date=time))
 
 
 if __name__ == '__main__':
@@ -64,4 +90,8 @@ if __name__ == '__main__':
              ]
 
     # files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
-    train_model(files, 5000, 6, .8)
+    if len(sys.argv) > 1:
+        uuid = sys.argv[1]
+    else:
+        uuid = 'model'
+    train_model(files, 5000, 2, .8, uuid=uuid)
