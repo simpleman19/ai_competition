@@ -151,3 +151,6 @@ fabric.properties
 
 # Editor-based Rest Client
 .idea/httpRequests
+
+#Custom
+rf_data/
