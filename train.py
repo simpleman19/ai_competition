@@ -19,6 +19,7 @@ def train_model(filenames, batch_size, epochs, train, samples=None):
         train_count = int(math.floor(samples * train))
         batches = int(math.floor(train_count / batch_size))
         for e in range(0, epochs):
+            print('Epoch {}/{}'.format(e, epochs))
             for i in range(0, batches - 1):
                 loss = model.train_on_batch(shuffled_data[i*batch_size:(i+1)*batch_size, 0, :],
                                      shuffled_one_hot[i*batch_size:(i+1)*batch_size])
