@@ -5,7 +5,7 @@ sudo yum groupinstall -y development
 sudo yum install -y https://centos7.iuscommunity.org/ius-release.rpm
 sudo yum update
 sudo yum install -y python36
-sudo yum install -y python36-pip python36-devel
+sudo yum install -y python36-pip python36-devel python36-tkinter
 git clone https://github.com/simpleman19/ai_competition.git
 cd ai_competition
 mkdir rf_data
