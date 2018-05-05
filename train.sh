@@ -6,10 +6,10 @@ for uuid in ${lines}; do
 cd /home/simpleman19/ai_competition
 pwd
 . .env/bin/activate
-pip install -r requirements.txt
 git checkout master
 git pull
 git checkout ${uuid}
+pip install -r requirements.txt
 python3.6 train.py ${uuid} > ${uuid}.log'"
 done
 
