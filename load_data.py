@@ -73,4 +73,6 @@ def load_data(fname):
     signalLabels_shuffled = signalLabels[shuffle_indices]
     oneHotLabels_shuffled = oneHotLabels[shuffle_indices]
 
-    return signalData_shuffled, oneHotLabels_shuffled, signalLabels_shuffled
+    signalData_shuffled_flat = signalData_shuffled.reshape(signalData_shuffled.shape[0], 2048)
+
+    return signalData_shuffled_flat, oneHotLabels_shuffled, signalLabels_shuffled
