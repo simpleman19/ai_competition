@@ -12,3 +12,7 @@ git pull
 git checkout ${uuid}
 python3.6 train.py ${uuid} > ${uuid}.log'"
 scp 198.204.229.156:'/home/simpleman19/ai_competition/*.{h5,png}' .
+ssh 198.204.229.156 bash -c "'
+rm /home/simpleman19/ai_competition/*.h5
+rm /home/simpleman19/ai_competition/*.png
+'"
