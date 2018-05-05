@@ -8,8 +8,8 @@ def compile_model():
     model = Sequential()
     model.add(Dense(1024,
                     input_dim=1024,
-                    activation='relu',
-                    kernel_regularizer=regularizers.l2(0.01)))
+                    activation='relu'
+                    ))
     model.add(Dense(512, activation='relu'))
     model.add(Dense(512, activation='relu'))
     model.add(Dense(128, activation='relu'))
