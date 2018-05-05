@@ -19,3 +19,5 @@ rm /home/simpleman19/ai_competition/*.h5
 rm /home/simpleman19/ai_competition/*.png
 rm /home/simpleman19/ai_competition/*.log
 '"
+rm train_list
+touch train_list
