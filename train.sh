@@ -2,7 +2,7 @@
 uuid=$(uuidgen)
 git tag ${uuid}
 git push origin --tags
-ssh -X 198.204.229.156 bash -c "'
+ssh 198.204.229.156 bash -c "'
 cd /home/simpleman19/ai_competition
 pwd
 . .env/bin/activate
