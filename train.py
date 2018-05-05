@@ -1,6 +1,6 @@
 import matplotlib
 matplotlib.use('Agg')
-from model1 import compile_model
+from model2 import compile_model
 import numpy
 import math
 import sys
@@ -52,7 +52,7 @@ def train_model(filenames, batch_size, epochs, train, samples=None, uuid=None):
             test_labels = numpy.concatenate([test_labels, shuffled_one_hot[train_count:samples]])
     time = datetime.datetime.now()
     scores = model.evaluate(test_data, test_labels)
-    model.save('{}-{date:%Y-%m-%d %H:%M:%S}-{score}.h5'.format(uuid, date=time, score=scores[1] * 100))
+    model.save('{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score}.h5'.format(uuid=uuid, date=time, score=scores[1] * 100))
     print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
     plot(loss, acc, time, uuid)
 
@@ -63,14 +63,14 @@ def plot(loss, acc, time, uuid):
     plt.ylabel('Loss')
     plt.xlabel('Epoch')
     plt.legend(['train'], loc='upper left')
-    plt.savefig('{}-loss-{date:%Y-%m-%d %H:%M:%S}.png'.format(uuid, date=time))
+    plt.savefig('{date:%Y-%m-%d %H:%M:%S}-loss-{uuid}.png'.format(uuid=uuid, date=time))
     plt.clf()
     plt.plot(acc)
     plt.title('Model Accuracy')
     plt.ylabel('Accuracy')
     plt.xlabel('Epoch')
     plt.legend(['train'], loc='upper left')
-    plt.savefig('{}-acc-{date:%Y-%m-%d %H:%M:%S}.png'.format(uuid, date=time))
+    plt.savefig('{date:%Y-%m-%d %H:%M:%S}-acc-{uuid}.png'.format(uuid=uuid, date=time))
 
 
 if __name__ == '__main__':
@@ -91,7 +91,7 @@ if __name__ == '__main__':
              'rf_data/training_data_chunk_14.pkl',
              ]
 
-    files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
+    # files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
     if len(sys.argv) > 1:
         uuid = sys.argv[1]
     else:
