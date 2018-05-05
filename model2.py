@@ -9,6 +9,6 @@ def compile_model():
     model.add(Dense(512, activation='relu'))
     model.add(Dense(256, activation='relu'))
     model.add(Dense(24, activation='softmax'))
-    adam = Adam(lr=0.001)
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    adam = Adam(lr=0.002)
+    model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
     return model
