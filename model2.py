@@ -17,7 +17,7 @@ def compile_model():
     model.add(Dense(128, activation='relu'))
     model.add(Dense(24, activation='softmax'))
     sgd = SGD(lr=0.02, momentum=0.2, decay=0.0, nesterov=False)
-    model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model
 
 
