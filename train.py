@@ -91,7 +91,7 @@ if __name__ == '__main__':
              'rf_data/training_data_chunk_14.pkl',
              ]
 
-    # files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
+    files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
     if len(sys.argv) > 1:
         uuid = sys.argv[1]
     else:
