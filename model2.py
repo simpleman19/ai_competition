@@ -14,5 +14,9 @@ def compile_model():
     model.add(Dense(512, activation='relu'))
     model.add(Dense(128, activation='relu'))
     model.add(Dense(24, activation='softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
     return model
+
+
+if __name__ == '__main__':
+    compile_model()
