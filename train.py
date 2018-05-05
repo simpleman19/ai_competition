@@ -96,4 +96,4 @@ if __name__ == '__main__':
         uuid = sys.argv[1]
     else:
         uuid = 'model'
-    train_model(files, 128, 2, .8, uuid=uuid)
+    train_model(files, 512, 2, .8, uuid=uuid)

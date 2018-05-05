@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 file="train_list"
 lines=`cat ${file}`
-for line in ${lines}; do
+for uuid in ${lines}; do
         ssh 198.204.229.156 bash -c "'
 cd /home/simpleman19/ai_competition
 pwd
