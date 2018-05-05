@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
-uuid=$(uuidgen)
-git commit -am "Auto commit"
-git push
-git tag ${uuid}
-git push origin --tags
-ssh 198.204.229.156 bash -c "'
+file="train_list"
+lines=`cat ${file}`
+for line in ${lines}; do
+        ssh 198.204.229.156 bash -c "'
 cd /home/simpleman19/ai_competition
 pwd
 . .env/bin/activate
@@ -13,6 +11,8 @@ git checkout master
 git pull
 git checkout ${uuid}
 python3.6 train.py ${uuid} > ${uuid}.log'"
+done
+
 scp 198.204.229.156:'/home/simpleman19/ai_competition/*.{h5,png,log}' archive/
 ssh 198.204.229.156 bash -c "'
 rm /home/simpleman19/ai_competition/*.h5
