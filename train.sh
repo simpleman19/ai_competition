@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 uuid=$(uuidgen)
+git commit -am "Auto commit"
+git push
 git tag ${uuid}
 git push origin --tags
 ssh 198.204.229.156 bash -c "'
