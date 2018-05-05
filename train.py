@@ -52,7 +52,7 @@ def train_model(filenames, batch_size, epochs, train, samples=None, uuid=None):
             test_labels = numpy.concatenate([test_labels, shuffled_one_hot[train_count:samples]])
     time = datetime.datetime.now()
     scores = model.evaluate(test_data, test_labels)
-    model.save('{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score}.h5'.format(uuid=uuid, date=time, score=scores[1] * 100))
+    model.save('{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=time, score=scores[1] * 100))
     print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
     plot(loss, acc, time, uuid)
 
@@ -91,9 +91,9 @@ if __name__ == '__main__':
              'rf_data/training_data_chunk_14.pkl',
              ]
 
-    files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
+    # files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
     if len(sys.argv) > 1:
         uuid = sys.argv[1]
     else:
         uuid = 'model'
-    train_model(files, 5000, 4, .8, uuid=uuid)
+    train_model(files, 5000, 1, .8, uuid=uuid)

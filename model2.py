@@ -12,5 +12,5 @@ def compile_model():
     model.add(Dense(256, activation='relu'))
     model.add(Dropout(.9))
     model.add(Dense(24, activation='softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer=Adadelta(), metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model
