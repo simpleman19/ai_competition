@@ -45,13 +45,13 @@ def train_model(filenames, batch_size, epochs, file_iterations, train, samples=N
                                                                             model.metrics_names[1], metrics[1]))
                 loss.append(metrics[0])
                 acc.append(metrics[1])
-
-            if test_data is None:
-                test_data = shuffled_data_flat[train_count:samples, :]
-                test_labels = shuffled_one_hot[train_count:samples]
-            else:
-                test_data = numpy.concatenate([test_data, shuffled_data_flat[train_count:samples, :]])
-                test_labels = numpy.concatenate([test_labels, shuffled_one_hot[train_count:samples]])
+            if f == 0:
+                if test_data is None:
+                    test_data = shuffled_data_flat[train_count:samples, :]
+                    test_labels = shuffled_one_hot[train_count:samples]
+                else:
+                    test_data = numpy.concatenate([test_data, shuffled_data_flat[train_count:samples, :]])
+                    test_labels = numpy.concatenate([test_labels, shuffled_one_hot[train_count:samples]])
     time = datetime.datetime.now()
     scores = model.evaluate(test_data, test_labels)
     model.save('{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=time, score=scores[1] * 100))
