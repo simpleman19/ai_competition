@@ -10,6 +10,7 @@ if [ -z "$ip" ]; then
     ip=$(gcloud compute instances describe ${name} --zone=${zone} | grep natIP: | sed 's/:/\n/g' | sed "s/ //g" | sed -n 2p)
     echo "Instance ip: ${ip}"
     echo "Setting up instance: "
+    ssh-keyscan -H ${ip} >> ~/.ssh/known_hosts
     ./setup_google.sh ${ip}
 fi
 
