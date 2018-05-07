@@ -4,7 +4,7 @@ file="train_list"
 lines=`cat ${file}`
 for uuid in ${lines}; do
         ssh -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host} bash -c "'
-cd /home/simpleman19/ai_competition
+cd /home/chancert413_google_com/ai_competition
 pwd
 . .env/bin/activate
 git checkout master
