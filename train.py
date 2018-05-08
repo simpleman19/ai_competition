@@ -5,6 +5,7 @@ import numpy
 import math
 import sys
 import datetime
+import tensorflow as tf
 import matplotlib.pyplot as plt
 from load_data import load_data
 
