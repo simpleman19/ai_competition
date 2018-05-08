@@ -14,7 +14,7 @@ pip install -r requirements.txt
 python3.6 train.py ${uuid} > ${uuid}.log'"
 done
 
-ssh -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host}:'/home/chancert413_gmail_com/ai_competition/*.{h5,png,log}' archive/
+scp -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host}:'/home/chancert413_gmail_com/ai_competition/*.{h5,png,log}' archive/
 ssh -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host} bash -c "'
 rm /home/chancert413_gmail_com/ai_competition/*.h5
 rm /home/chancert413_gmail_com/ai_competition/*.png

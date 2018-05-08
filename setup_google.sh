@@ -28,4 +28,5 @@ fusermount -u temp
 python3.6 -m venv .env
 . .env/bin/activate
 pip install -r requirements.txt
+./install_cuda.sh
 '"
