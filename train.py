@@ -11,6 +11,8 @@ from load_data import load_data
 
 numpy.random.seed(7)
 
+sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
+
 
 def train_model(filenames, batch_size, epochs, file_iterations, train, samples=None, uuid=None):
     model = compile_model()
