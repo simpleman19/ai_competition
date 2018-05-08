@@ -23,7 +23,7 @@ cd ai_competition
 mkdir rf_data
 mkdir temp
 gcsfuse training_data_0 temp
-rsync -avh temp/* rf_data/
+rsync -avh --progress temp/* rf_data/
 fusermount -u temp
 python3.6 -m venv .env
 . .env/bin/activate

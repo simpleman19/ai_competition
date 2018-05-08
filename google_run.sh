@@ -13,6 +13,8 @@ if [ -z "$ip" ]; then
     echo "Sleeping during initial setup"
     sleep 30
     ./setup_google.sh ${ip}
+    echo "Done with setup, sleeping for 5mins to let everything finish"
+    sleep 5m
 fi
 
 ./train_google.sh $ip
