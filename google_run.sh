@@ -2,17 +2,16 @@
 zone=us-west1-b
 name=training
 
-ip=$(gcloud compute instances describe ${name} --zone=${zone} | grep natIP: | sed 's/:/\n/g' | sed "s/ //g" | sed -n 2p)
+ip= #$(gcloud compute instances describe ${name} --zone=${zone} | grep natIP: | sed 's/:/\n/g' | sed "s/ //g" | sed -n 2p)
 
 if [ -z "$ip" ]; then
     echo "Could not find instance, creating a new one"
-    ./start_instance.sh ${name} ${zone}
+    #./start_instance.sh ${name} ${zone}
     ip=$(gcloud compute instances describe ${name} --zone=${zone} | grep natIP: | sed 's/:/\n/g' | sed "s/ //g" | sed -n 2p)
     echo "Instance ip: ${ip}"
     echo "Setting up instance: "
     echo "Sleeping during initial setup"
-    ssh-keyscan ${ip} >> ~/.ssh/known_hosts
-    sleep 15m
+    sleep 30
     ./setup_google.sh ${ip}
 fi
 

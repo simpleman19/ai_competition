@@ -14,8 +14,8 @@ fi
 if ! rpm -q cuda-9-0; then
   sudo yum install cuda-9-0 -y
 fi
-check_fail = $(nvidia-smi -pm 1 | grep fail)
+check_fail=$(nvidia-smi -pm 1 | grep fail)
 # Enable persistence mode
-if [ -z "$check_fail" ]; then
+if [ ! -z "$check_fail" ]; then
     reboot
 fi

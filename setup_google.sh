@@ -12,7 +12,7 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
        https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 EOF
 sudo yum update -y
-sudo yum install -y yum-utils git nfs-utils gcsfuse
+sudo yum install -y yum-utils git nfs-utils gcsfuse rsync
 sudo yum groupinstall -y development
 sudo yum install -y https://centos7.iuscommunity.org/ius-release.rpm
 sudo yum update
@@ -23,10 +23,11 @@ cd ai_competition
 mkdir rf_data
 mkdir temp
 gcsfuse training_data_0 temp
-cp temp/training_data_chunk_0.pkl rf_data/
+rsync -avh temp/* rf_data/
 fusermount -u temp
 python3.6 -m venv .env
 . .env/bin/activate
 pip install -r requirements.txt
+chmod +x install_cuda.sh
 ./install_cuda.sh
 '"
