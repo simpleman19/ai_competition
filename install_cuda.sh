@@ -6,11 +6,11 @@ sudo yum clean all
 # Install Extra Packages for Enterprise Linux (EPEL) for dependencies
 sudo yum install epel-release -y
 sudo yum update -y
-sudo yum install kernel-devel-$(uname -r) kernel-headers-$(uname -r)
-sudo yum -y install gcc gcc-c++ python-pip python-devel atlas atlas-devel gcc-gfortran openssl-devel libffi-devel
+sudo yum install -y kernel-devel-$(uname -r) kernel-headers-$(uname -r)
+sudo yum -y install gcc gcc-c++ python-pip python-devel atlas atlas-devel gcc-gfortran openssl-devel libffi-devel wget
 sudo yum install cuda -y
 wget https://developer.nvidia.com/compute/cuda/8.0/Prod2/local_installers/cuda_8.0.61_375.26_linux-run
-sudo sh cuda_8.0.61_375.26_linux.run
+sudo sh cuda_8.0.61_375.26_linux-run
 wget https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.1.3/prod/8.0_20180414/cudnn-8.0-linux-x64-v7.1
 tar zxf cudnn-8.0-linux-x64-v7.1.tgz
 sudo cp cuda/include/cudnn.h /usr/local/cuda-8.0/include/

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-host=$1
+zone=us-west1-b
+name=instance-1
+host=$(gcloud compute instances describe ${name} --zone=${zone} | grep natIP: | sed 's/:/\n/g' | sed "s/ //g" | sed -n 2p)
 file="train_list"
 lines=`cat ${file}`
 for uuid in ${lines}; do
