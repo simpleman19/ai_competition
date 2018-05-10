@@ -47,10 +47,10 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
                                                                              model.metrics_names[1], metrics[1]))
                 loss.append(metrics[0])
                 acc.append(metrics[1])
-                shuffled_data_flat, shuffled_one_hot = None, None
-                shuffled_data_flat, shuffled_one_hot = load_data(train_names[0])
-                model.evaluate(shuffled_data_flat, shuffled_one_hot)
-                shuffled_data_flat, shuffled_one_hot = None, None
+            shuffled_data_flat, shuffled_one_hot = None, None
+            shuffled_data_flat, shuffled_one_hot = load_data(train_names[0])
+            model.evaluate(shuffled_data_flat, shuffled_one_hot)
+            shuffled_data_flat, shuffled_one_hot = None, None
     time = datetime.datetime.now()
     scores = model.evaluate(test_data, test_labels)
     model.save('{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=time, score=scores[1] * 100))
