@@ -14,7 +14,7 @@ numpy.random.seed(7)
 sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
 
 
-def train_model(filenames, batch_size, epochs, file_iterations, train, samples=None, uuid=None):
+def train_model(filenames, train_names, batch_size, epochs, file_iterations, train_count=None, uuid=None):
     model = compile_model()
     test_data = None
     test_labels = None
@@ -24,10 +24,9 @@ def train_model(filenames, batch_size, epochs, file_iterations, train, samples=N
         print('-- File Iteration -- {}'.format(f + 1))
         for file in filenames:
             print('-- New File -- {}'.format(file))
-            shuffled_data_flat, shuffled_one_hot, shuffled_labels = load_data(file)
-            if samples is None:
-                samples = len(shuffled_one_hot)
-            train_count = int(math.floor(samples * train))
+            shuffled_data_flat, shuffled_one_hot = load_data(file)
+            if train_count is None:
+                train_count = len(shuffled_one_hot)
             batches = int(math.floor(train_count / batch_size))
             for e in range(0, epochs):
                 print('Epoch {}/{}'.format(e+1, epochs))
@@ -43,18 +42,15 @@ def train_model(filenames, batch_size, epochs, file_iterations, train, samples=N
                 metrics = model.train_on_batch(shuffled_data_flat[(batches-1) * batch_size:train_count, :],
                                             shuffled_one_hot[(batches-1) * batch_size:train_count])
                 print('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f}'.format(train_count,
-                                                                            train_count,
-                                                                            model.metrics_names[0], metrics[0],
-                                                                            model.metrics_names[1], metrics[1]))
+                                                                             train_count,
+                                                                             model.metrics_names[0], metrics[0],
+                                                                             model.metrics_names[1], metrics[1]))
                 loss.append(metrics[0])
                 acc.append(metrics[1])
-            if f == 0:
-                if test_data is None:
-                    test_data = shuffled_data_flat[train_count:samples, :]
-                    test_labels = shuffled_one_hot[train_count:samples]
-                else:
-                    test_data = numpy.concatenate([test_data, shuffled_data_flat[train_count:samples, :]])
-                    test_labels = numpy.concatenate([test_labels, shuffled_one_hot[train_count:samples]])
+                shuffled_data_flat, shuffled_one_hot = None, None
+                shuffled_data_flat, shuffled_one_hot = load_data(train_names[0])
+                model.evaluate(shuffled_data_flat, shuffled_one_hot)
+                shuffled_data_flat, shuffled_one_hot = None, None
     time = datetime.datetime.now()
     scores = model.evaluate(test_data, test_labels)
     model.save('{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=time, score=scores[1] * 100))
@@ -93,12 +89,13 @@ if __name__ == '__main__':
              'rf_data/training_data_chunk_11.pkl',
              'rf_data/training_data_chunk_12.pkl',
              'rf_data/training_data_chunk_13.pkl',
-             'rf_data/training_data_chunk_14.pkl',
              ]
-
+    train_names = [
+        'rf_data/training_data_chunk_14.pkl',
+    ]
     # files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
     if len(sys.argv) > 1:
         uuid = sys.argv[1]
     else:
         uuid = 'model'
-    train_model(files, 64, 4, 1, .8, uuid=uuid)
+    train_model(files, train_names, 32, 4, 1, uuid=uuid)

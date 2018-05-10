@@ -24,3 +24,13 @@ rm /home/chancert413_gmail_com/ai_competition/*.log
 '"
 rm train_list
 touch train_list
+
+if [ "$1" == "-d" ]; then
+    if [ -z "$host" ]; then
+        echo "Didn't find instance to delete"
+    else
+        echo "Stopping Instance: "
+        gcloud -q compute instances stop ${name} --zone=${zone}
+        ssh-keygen -R ${host}
+    fi
+fi
