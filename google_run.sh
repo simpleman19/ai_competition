@@ -2,7 +2,7 @@
 zone=us-west1-b
 name=instance-1
 
-ip= #$(gcloud compute instances describe ${name} --zone=${zone} | grep natIP: | sed 's/:/\n/g' | sed "s/ //g" | sed -n 2p)
+ip=$(gcloud compute instances describe ${name} --zone=${zone} | grep natIP: | sed 's/:/\n/g' | sed "s/ //g" | sed -n 2p)
 
 if [ -z "$ip" ]; then
     echo "Could not find instance, creating a new one"

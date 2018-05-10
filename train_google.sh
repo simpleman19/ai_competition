@@ -1,8 +1,17 @@
 #!/usr/bin/env bash
 zone=us-west1-b
 name=instance-1
-host=$(gcloud compute instances describe ${name} --zone=${zone} | grep natIP: | sed 's/:/\n/g' | sed "s/ //g" | sed -n 2p)
 file="train_list"
+host=$(gcloud compute instances describe ${name} --zone=${zone} | grep natIP: | sed 's/:/\n/g' | sed "s/ //g" | sed -n 2p)
+
+if [ -z "$host" ]; then
+echo "Starting Instance"
+gcloud -q compute instances start ${name} --zone=${zone}
+sleep 30
+host=$(gcloud compute instances describe ${name} --zone=${zone} | grep natIP: | sed 's/:/\n/g' | sed "s/ //g" | sed -n 2p)
+fi
+
+
 lines=`cat ${file}`
 for uuid in ${lines}; do
         ssh -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host} bash -c "'
