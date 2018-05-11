@@ -1,6 +1,6 @@
 import matplotlib
 matplotlib.use('Agg')
-from model2 import compile_model
+from model3 import compile_model
 import numpy
 import math
 import sys
@@ -153,4 +153,4 @@ if __name__ == '__main__':
         uuid = sys.argv[1]
     else:
         uuid = 'model'
-    train_model(files, train_names, 128, 6, 2, uuid=uuid)
+    train_lstm(files, train_names, 128, 2, 2, uuid=uuid)
