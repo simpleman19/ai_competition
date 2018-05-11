@@ -149,6 +149,6 @@ def load_data_lstm(fname):
     signalLabels_shuffled = signalLabels[shuffle_indices]
     oneHotLabels_shuffled = oneHotLabels[shuffle_indices]
 
-    signalData_shuffled_flat = signalData_shuffled.reshape(signalData_shuffled.shape[0], 2048)
+    signalData_shuffled_flat = signalData_shuffled.transpose(0, 2, 1)
 
     return signalData_shuffled_flat, oneHotLabels_shuffled
