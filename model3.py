@@ -6,7 +6,7 @@ from keras import regularizers
 
 def compile_model():
     model = Sequential()
-    model.add(LSTM(500, input_shape=(1024, 2)))
+    model.add(LSTM(300, input_shape=(1024, 2)))
     model.add(Dense(24, activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
     return model
