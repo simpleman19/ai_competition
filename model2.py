@@ -11,7 +11,6 @@ def compile_model():
                     input_dim=2048,
                     activation='tanh'
                     ))
-    model.add(PReLU())
     model.add(Dense(4096, activation='linear'))
     model.add(PReLU())
     model.add(Dense(2048, activation='linear'))
