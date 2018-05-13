@@ -1,8 +1,9 @@
 import pickle
 import numpy as np
+from sklearn import preprocessing
 
 
-def load_data(fname):
+def load_data(fname, scaler=None):
     '''  Load dataset from pickled file '''
 
     TAG = "-"
@@ -70,12 +71,18 @@ def load_data(fname):
     np.random.seed(2017)
     shuffle_indices = np.random.permutation(np.arange(len(signalLabels)))
     signalData_shuffled = signalData[shuffle_indices]
-    signalLabels_shuffled = signalLabels[shuffle_indices]
+    signalData = None
+    # signalLabels_shuffled = signalLabels[shuffle_indices]
+    signalLabels = None
     oneHotLabels_shuffled = oneHotLabels[shuffle_indices]
+    oneHotLabels = None
 
-    signalData_shuffled_flat = signalData_shuffled.reshape(signalData_shuffled.shape[0], 2048)
+    if scaler is not None:
+        signalData_shuffled = scaler.fit_transform(signalData_shuffled.reshape(signalData_shuffled.shape[0], 2048))
+    else:
+        signalData_shuffled = signalData_shuffled.reshape(signalData_shuffled.shape[0], 2048)
 
-    return signalData_shuffled_flat, oneHotLabels_shuffled
+    return signalData_shuffled, oneHotLabels_shuffled
 
 
 def load_data_lstm(fname):

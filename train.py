@@ -15,18 +15,18 @@ sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
 
 
 def train_model(filenames, train_names, batch_size, epochs, file_iterations, train_count=None, uuid=None):
-    model = compile_model()
+    model, scaler = compile_model()
     test_data = None
     test_labels = None
     loss = []
     acc = []
     ev = []
-    train_shuffled_data_flat, train_shuffled_one_hot = load_data_lstm(train_names[0])
+    train_shuffled_data_flat, train_shuffled_one_hot = load_data(train_names[0], scaler)
     for f in range(0, file_iterations):
         print('-- File Iteration -- {}'.format(f + 1))
         for file in filenames:
             print('-- New File -- {}'.format(file))
-            shuffled_data_flat, shuffled_one_hot = load_data(file)
+            shuffled_data_flat, shuffled_one_hot = load_data(file, scaler)
             if train_count is None:
                 train_count = len(shuffled_one_hot)
             batches = int(math.floor(train_count / batch_size))
