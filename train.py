@@ -146,9 +146,9 @@ if __name__ == '__main__':
     train_names = [
         'rf_data/training_data_chunk_14.pkl',
     ]
-    files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
+    # files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
     if len(sys.argv) > 1:
         uuid = sys.argv[1]
     else:
         uuid = 'model'
-    train_model(files, train_names, 512, 2, 2, uuid=uuid)
+    train_model(files, train_names, 512, 2, 2, uuid=uuid, train_count=10000)
