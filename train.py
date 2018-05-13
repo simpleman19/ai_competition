@@ -21,6 +21,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
     loss = []
     acc = []
     ev = []
+    train_shuffled_data_flat, train_shuffled_one_hot = load_data_lstm(train_names[0])
     for f in range(0, file_iterations):
         print('-- File Iteration -- {}'.format(f + 1))
         for file in filenames:
@@ -49,9 +50,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
                 loss.append(metrics[0])
                 acc.append(metrics[1])
             shuffled_data_flat, shuffled_one_hot = None, None
-            shuffled_data_flat, shuffled_one_hot = load_data(train_names[0])
-            ev.append(model.evaluate(shuffled_data_flat, shuffled_one_hot)[1])
-            shuffled_data_flat, shuffled_one_hot = None, None
+            ev.append(model.evaluate(train_shuffled_data_flat, train_shuffled_one_hot)[1])
     time = datetime.datetime.now()
     shuffled_data_flat, shuffled_one_hot = load_data(train_names[0])
     scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
@@ -67,6 +66,7 @@ def train_lstm(filenames, train_names, batch_size, epochs, file_iterations, trai
     loss = []
     acc = []
     ev = []
+    train_shuffled_data_flat, train_shuffled_one_hot = load_data_lstm(train_names[0])
     for f in range(0, file_iterations):
         print('-- File Iteration -- {}'.format(f + 1))
         for file in filenames:
@@ -95,9 +95,7 @@ def train_lstm(filenames, train_names, batch_size, epochs, file_iterations, trai
                 loss.append(metrics[0])
                 acc.append(metrics[1])
             shuffled_data_flat, shuffled_one_hot = None, None
-            shuffled_data_flat, shuffled_one_hot = load_data_lstm(train_names[0])
-            ev.append(model.evaluate(shuffled_data_flat, shuffled_one_hot)[1])
-            shuffled_data_flat, shuffled_one_hot = None, None
+            ev.append(model.evaluate(train_shuffled_data_flat, train_shuffled_one_hot)[1])
     time = datetime.datetime.now()
     shuffled_data_flat, shuffled_one_hot = load_data(train_names[0])
     scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
@@ -153,4 +151,4 @@ if __name__ == '__main__':
         uuid = sys.argv[1]
     else:
         uuid = 'model'
-    train_model(files, train_names, 512, 3, 2, uuid=uuid)
+    train_model(files, train_names, 512, 1, 3, uuid=uuid)
