@@ -11,9 +11,9 @@ def compile_model():
                     input_dim=2048,
                     activation='tanh'
                     ))
-    model.add(Dense(4096, activation='relu'))
-    model.add(Dense(2048, activation='relu'))
-    model.add(Dense(512, activation='relu'))
+    model.add(Dense(4096, activation='tanh'))
+    model.add(Dense(2048, activation='tanh'))
+    model.add(Dense(512, activation='tanh'))
     model.add(Dense(24, activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     scaler = preprocessing.MinMaxScaler(feature_range=(-2, 2))
