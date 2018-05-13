@@ -57,7 +57,8 @@ def load_data(fname, scaler=None):
                     instance_shape = np.shape(instance)
 
         one_hot_index += 1  # keep track of iteration for one hot vector generation
-
+    del dataCube
+    del dataCubeKeyIndices
     # convert to np.arrays
     print(TAG + "Converting to numpy arrays...")
     signalData = np.asarray(signalData)
@@ -71,11 +72,11 @@ def load_data(fname, scaler=None):
     np.random.seed(2017)
     shuffle_indices = np.random.permutation(np.arange(len(signalLabels)))
     signalData_shuffled = signalData[shuffle_indices]
-    signalData = None
+    del signalData
     # signalLabels_shuffled = signalLabels[shuffle_indices]
-    signalLabels = None
+    del signalLabels
     oneHotLabels_shuffled = oneHotLabels[shuffle_indices]
-    oneHotLabels = None
+    del oneHotLabels
 
     if scaler is not None:
         signalData_shuffled = scaler.fit_transform(signalData_shuffled.reshape(signalData_shuffled.shape[0], 2048))
