@@ -5,17 +5,21 @@ from sklearn import preprocessing
 
 
 def compile_model():
+    scaler = None
     model = Sequential()
     model.add(Dense(2048,
                     input_dim=2048,
-                    activation='tanh'
+                    activation='linear'
                     ))
-    model.add(Dense(4096, activation='relu'))
-    model.add(Dense(2048, activation='relu'))
-    model.add(Dense(512, activation='relu'))
+    model.add(PReLU())
+    model.add(Dense(4096, activation='linear'))
+    model.add(PReLU())
+    model.add(Dense(2048, activation='linear'))
+    model.add(PReLU())
+    model.add(Dense(512, activation='sigmoid'))
     model.add(Dense(24, activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    scaler = preprocessing.MinMaxScaler(feature_range=(-1, 1))
+    # scaler = preprocessing.MinMaxScaler(feature_range=(-1, 1))
     return model, scaler
 
 
