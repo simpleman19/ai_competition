@@ -21,7 +21,6 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
     loss = []
     acc = []
     ev = []
-    train_shuffled_data_flat, train_shuffled_one_hot = load_data(train_names[0], scaler)
     for f in range(0, file_iterations):
         print('-- File Iteration -- {}'.format(f + 1))
         for file in filenames:
@@ -49,8 +48,10 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
                                                                              model.metrics_names[1], metrics[1]))
                 loss.append(metrics[0])
                 acc.append(metrics[1])
-            shuffled_data_flat, shuffled_one_hot = None, None
-            ev.append(model.evaluate(train_shuffled_data_flat, train_shuffled_one_hot)[1])
+            shuffled_data_flat, shuffled_one_hot = load_data(train_names[0], scaler)
+            ev.append(model.evaluate(shuffled_data_flat, shuffled_one_hot)[1])
+            del shuffled_data_flat
+            del shuffled_one_hot
     time = datetime.datetime.now()
     shuffled_data_flat, shuffled_one_hot = load_data(train_names[0])
     scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
