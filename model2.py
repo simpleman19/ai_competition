@@ -9,14 +9,14 @@ def compile_model():
     model = Sequential()
     model.add(Dense(2048,
                     input_dim=2048,
-                    activation='tanh'
+                    activation='relu'
                     ))
-    model.add(Dense(8192, activation='tanh'))
-    model.add(Dense(2048, activation='tanh'))
-    model.add(Dense(512, activation='tanh'))
+    model.add(Dense(8192, activation='relu'))
+    model.add(Dense(2048, activation='relu'))
+    model.add(Dense(512, activation='relu'))
     model.add(Dense(24, activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    scaler = preprocessing.MinMaxScaler(feature_range=(-1, 1))
+    scaler = preprocessing.MinMaxScaler(feature_range=(0, 4))
     return model, scaler
 
 
