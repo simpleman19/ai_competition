@@ -9,7 +9,7 @@ def compile_model():
     model = Sequential()
     model.add(Dense(2048,
                     input_dim=2048,
-                    activation='linear'
+                    activation='tanh'
                     ))
     model.add(PReLU())
     model.add(Dense(4096, activation='linear'))
@@ -19,7 +19,7 @@ def compile_model():
     model.add(Dense(512, activation='sigmoid'))
     model.add(Dense(24, activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    # scaler = preprocessing.MinMaxScaler(feature_range=(-1, 1))
+    scaler = preprocessing.MinMaxScaler(feature_range=(-1, 1))
     return model, scaler
 
 
