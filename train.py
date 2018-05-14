@@ -11,16 +11,13 @@ from load_data import load_data, load_data_lstm
 
 numpy.random.seed(7)
 
-sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
-
 
 def train_model(filenames, train_names, batch_size, epochs, file_iterations, train_count=None, uuid=None):
     model, scaler = compile_model()
-    test_data = None
-    test_labels = None
     loss = []
     acc = []
     ev = []
+    k = []
     for f in range(0, file_iterations):
         print('-- File Iteration -- {}'.format(f + 1))
         for file in filenames:
@@ -33,23 +30,29 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
                 print('Epoch {}/{}'.format(e+1, epochs))
                 for i in range(0, batches - 1):
                     metrics = model.train_on_batch(shuffled_data_flat[i*batch_size:(i+1)*batch_size, :],
-                                         shuffled_one_hot[i*batch_size:(i+1)*batch_size])
-                    print('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f}'.format((i+1)*batch_size,
+                                                   shuffled_one_hot[i*batch_size:(i+1)*batch_size])
+                    print('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f} - {:5s} {:1.4f}'.format((i+1)*batch_size,
                                                                                  train_count,
                                                                                  model.metrics_names[0], metrics[0],
-                                                                                 model.metrics_names[1], metrics[1]))
+                                                                                 model.metrics_names[1], metrics[1],
+                                                                                 model.metrics_names[2], metrics[2]))
                     loss.append(metrics[0])
                     acc.append(metrics[1])
+                    k.append(metrics[2])
                 metrics = model.train_on_batch(shuffled_data_flat[(batches-1) * batch_size:train_count, :],
-                                            shuffled_one_hot[(batches-1) * batch_size:train_count])
-                print('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f}'.format(train_count,
+                                               shuffled_one_hot[(batches-1) * batch_size:train_count])
+                print('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f} - {:5s} {:1.4f}'.format(train_count,
                                                                              train_count,
                                                                              model.metrics_names[0], metrics[0],
-                                                                             model.metrics_names[1], metrics[1]))
+                                                                             model.metrics_names[1], metrics[1],
+                                                                             model.metrics_names[2], metrics[2]))
                 loss.append(metrics[0])
                 acc.append(metrics[1])
+                k.append(metrics[2])
             shuffled_data_flat, shuffled_one_hot = load_data(train_names[0], scaler)
-            ev.append(model.evaluate(shuffled_data_flat, shuffled_one_hot)[1])
+            scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
+            ev.append(scores[1])
+            print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
             del shuffled_data_flat
             del shuffled_one_hot
     time = datetime.datetime.now()
@@ -57,7 +60,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
     scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
     model.save('{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=time, score=scores[1] * 100))
     print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
-    plot(loss, acc, ev, time, uuid)
+    plot(loss, acc, ev, k, time, uuid)
 
 
 def train_lstm(filenames, train_names, batch_size, epochs, file_iterations, train_count=None, uuid=None):
@@ -105,7 +108,7 @@ def train_lstm(filenames, train_names, batch_size, epochs, file_iterations, trai
     plot(loss, acc, ev, time, uuid)
 
 
-def plot(loss, acc, ev, time, uuid):
+def plot(loss, acc, ev, k, time, uuid):
     plt.plot(loss)
     plt.title('Model Loss')
     plt.ylabel('Loss')
@@ -114,10 +117,11 @@ def plot(loss, acc, ev, time, uuid):
     plt.savefig('{date:%Y-%m-%d %H:%M:%S}-loss-{uuid}.png'.format(uuid=uuid, date=time))
     plt.clf()
     plt.plot(acc)
+    plt.plot(k)
     plt.title('Model Accuracy')
     plt.ylabel('Accuracy')
     plt.xlabel('Batch')
-    plt.legend(['train'], loc='upper left')
+    plt.legend(['train', 'top_2'], loc='upper left')
     plt.savefig('{date:%Y-%m-%d %H:%M:%S}-acc-{uuid}.png'.format(uuid=uuid, date=time))
     plt.clf()
     plt.plot(ev)
