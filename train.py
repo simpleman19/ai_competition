@@ -51,8 +51,9 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
                 k.append(metrics[2])
             shuffled_data_flat, shuffled_one_hot = load_data(train_names[0], scaler)
             scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
-            ev.append(scores[1])
+            ev.append(scores)
             print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
+            print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
             del shuffled_data_flat
             del shuffled_one_hot
     time = datetime.datetime.now()
@@ -60,6 +61,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
     scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
     model.save('{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=time, score=scores[1] * 100))
     print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
+    print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
     plot(loss, acc, ev, k, time, uuid)
 
 
@@ -124,7 +126,8 @@ def plot(loss, acc, ev, k, time, uuid):
     plt.legend(['train', 'top_2'], loc='upper left')
     plt.savefig('{date:%Y-%m-%d %H:%M:%S}-acc-{uuid}.png'.format(uuid=uuid, date=time))
     plt.clf()
-    plt.plot(ev)
+    plt.plot(ev[:, 1])
+    plt.plot(ev[:, 2])
     plt.title('Model Evaluation')
     plt.ylabel('Accuracy')
     plt.xlabel('Batch')
@@ -156,4 +159,4 @@ if __name__ == '__main__':
         uuid = sys.argv[1]
     else:
         uuid = 'model'
-    train_model(files, train_names, 512, 2, 3, uuid=uuid)
+    train_model(files, train_names, 512, 1, 1, uuid=uuid)
