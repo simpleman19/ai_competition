@@ -51,7 +51,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
                 k.append(metrics[2])
             shuffled_data_flat, shuffled_one_hot = load_data(train_names[0], scaler)
             scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
-            ev.append(scores)
+            ev.append(list(scores))
             print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
             print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
             del shuffled_data_flat
@@ -62,17 +62,15 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
     model.save('{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=time, score=scores[1] * 100))
     print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
     print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
-    plot(loss, acc, ev, k, time, uuid)
+    plot(loss, acc, numpy.asarray(ev), k, time, uuid)
 
 
-def train_lstm(filenames, train_names, batch_size, epochs, file_iterations, train_count=None, uuid=None):
+def train_lstm(filenames, train_names, batch_size, epochs, file_iterations, train_count=None, uuid=None, evaluate=True):
     model = compile_model()
-    test_data = None
-    test_labels = None
     loss = []
     acc = []
     ev = []
-    train_shuffled_data_flat, train_shuffled_one_hot = load_data_lstm(train_names[0])
+    k = []
     for f in range(0, file_iterations):
         print('-- File Iteration -- {}'.format(f + 1))
         for file in filenames:
@@ -84,30 +82,41 @@ def train_lstm(filenames, train_names, batch_size, epochs, file_iterations, trai
             for e in range(0, epochs):
                 print('Epoch {}/{}'.format(e+1, epochs))
                 for i in range(0, batches - 1):
-                    metrics = model.train_on_batch(shuffled_data_flat[i*batch_size:(i+1)*batch_size, :, :],
+                    metrics = model.train_on_batch(shuffled_data_flat[i*batch_size:(i+1)*batch_size, :],
                                                    shuffled_one_hot[i*batch_size:(i+1)*batch_size])
-                    print('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f}'.format((i+1)*batch_size,
+                    print('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f} - {:5s} {:1.4f}'.format((i+1)*batch_size,
                                                                                  train_count,
                                                                                  model.metrics_names[0], metrics[0],
-                                                                                 model.metrics_names[1], metrics[1]))
+                                                                                 model.metrics_names[1], metrics[1],
+                                                                                 model.metrics_names[2], metrics[2]))
                     loss.append(metrics[0])
                     acc.append(metrics[1])
-                metrics = model.train_on_batch(shuffled_data_flat[(batches-1) * batch_size:train_count, :, :],
+                    k.append(metrics[2])
+                metrics = model.train_on_batch(shuffled_data_flat[(batches-1) * batch_size:train_count, :],
                                                shuffled_one_hot[(batches-1) * batch_size:train_count])
-                print('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f}'.format(train_count,
+                print('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f} - {:5s} {:1.4f}'.format(train_count,
                                                                              train_count,
                                                                              model.metrics_names[0], metrics[0],
-                                                                             model.metrics_names[1], metrics[1]))
+                                                                             model.metrics_names[1], metrics[1],
+                                                                             model.metrics_names[2], metrics[2]))
                 loss.append(metrics[0])
                 acc.append(metrics[1])
-            shuffled_data_flat, shuffled_one_hot = None, None
-            ev.append(model.evaluate(train_shuffled_data_flat, train_shuffled_one_hot)[1])
+                k.append(metrics[2])
+            if evaluate:
+                shuffled_data_flat, shuffled_one_hot = load_data_lstm(train_names[0])
+                scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
+                ev.append(scores)
+                print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
+                print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
+            del shuffled_data_flat
+            del shuffled_one_hot
     time = datetime.datetime.now()
-    shuffled_data_flat, shuffled_one_hot = load_data(train_names[0])
+    shuffled_data_flat, shuffled_one_hot = load_data_lstm(train_names[0])
     scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
     model.save('{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=time, score=scores[1] * 100))
     print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
-    plot(loss, acc, ev, time, uuid)
+    print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
+    plot(loss, acc, ev, k, time, uuid)
 
 
 def plot(loss, acc, ev, k, time, uuid):
@@ -159,4 +168,5 @@ if __name__ == '__main__':
         uuid = sys.argv[1]
     else:
         uuid = 'model'
-    train_model(files, train_names, 512, 1, 1, uuid=uuid)
+    # train_lstm(files, train_names, 512, 2, 3, uuid=uuid, evaluate=False, train_count=10000)
+    train_model(files, train_names, 512, 2, 3, uuid=uuid)
