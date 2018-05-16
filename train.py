@@ -24,14 +24,18 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
     train_shuffled_one_hot = None
     temp_data, temp_one_hot = None, None
     if load_on_start:
+        print('Loading on startup...')
         for f in filenames:
+            print('Loading: ' + f)
             if shuffled_data_flat is None:
                 shuffled_data_flat, shuffled_one_hot = load_data(f, scaler)
             else:
                 temp_data, temp_one_hot = load_data(f, scaler)
                 shuffled_data_flat = numpy.concatenate((shuffled_data_flat, temp_data), axis=0)
                 shuffled_one_hot = numpy.concatenate((shuffled_one_hot, temp_one_hot), axis=0)
+                print(shuffled_one_hot.shape)
         for f in train_names:
+            print('Loading: ' + f)
             if shuffled_data_flat is None:
                 train_shuffled_data_flat, train_shuffled_one_hot = load_data(f, scaler)
             else:
@@ -250,4 +254,4 @@ if __name__ == '__main__':
         uuid = 'model'
     # train_lstm(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
     # train_conv(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
-    train_model(files, train_names, 512, 2, 3, uuid=uuid, load_on_start=True)
+    train_model(files, train_names, 512, 2, 6, uuid=uuid, load_on_start=True)
