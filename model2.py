@@ -29,8 +29,8 @@ def compile_model():
     model.add(Dense(4096, activation='linear'))
     model.add(PReLU())
     model.add(Dense(24, activation='softmax'))
-    sgd = SGD(lr=0.02, momentum=0.2, decay=0.00001, nesterov=False)
-    model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy', top_2])
+    adam = Adam(lr=.0006, beta_1=.9, beta_2=.95, decay=0, amsgrad=True)
+    model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy', top_2])
     # scaler = preprocessing.MinMaxScaler(feature_range=(-1, 1))
     return model, scaler
 
