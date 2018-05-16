@@ -26,7 +26,7 @@ def compile_model():
     model.add(PReLU())
     model.add(Dense(8192, activation='linear'))
     model.add(PReLU())
-    model.add(Dense(4096, activation='linear'))
+    model.add(Dense(8192, activation='linear'))
     model.add(PReLU())
     model.add(Dense(24, activation='softmax'))
     adam = Adam(lr=.0006, beta_1=.9, beta_2=.95, decay=0, amsgrad=True)

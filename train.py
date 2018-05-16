@@ -12,17 +12,40 @@ from load_data import load_data, load_data_lstm, load_data_conv
 numpy.random.seed(12)
 
 
-def train_model(filenames, train_names, batch_size, epochs, file_iterations, train_count=None, uuid=None):
+def train_model(filenames, train_names, batch_size, epochs, file_iterations, train_count=None, uuid=None, load_on_start=False):
     model, scaler = compile_model()
     loss = []
     acc = []
     ev = []
     k = []
+    shuffled_data_flat = None
+    shuffled_one_hot = None
+    train_shuffled_data_flat = None
+    train_shuffled_one_hot = None
+    temp_data, temp_one_hot = None, None
+    if load_on_start:
+        for f in filenames:
+            if shuffled_data_flat is None:
+                shuffled_data_flat, shuffled_one_hot = load_data(f, scaler)
+            else:
+                temp_data, temp_one_hot = load_data(f, scaler)
+                shuffled_data_flat = numpy.concatenate((shuffled_data_flat, temp_data), axis=0)
+                shuffled_one_hot = numpy.concatenate((shuffled_one_hot, temp_one_hot), axis=0)
+        for f in train_names:
+            if shuffled_data_flat is None:
+                train_shuffled_data_flat, train_shuffled_one_hot = load_data(f, scaler)
+            else:
+                temp_data, temp_one_hot = load_data(f, scaler)
+                train_shuffled_data_flat = numpy.concatenate((train_shuffled_data_flat, temp_data), axis=0)
+                train_shuffled_one_hot = numpy.concatenate((train_shuffled_one_hot, temp_one_hot), axis=0)
+        del temp_data, temp_one_hot
+        filenames = ['Loaded_On_Startup']
     for f in range(0, file_iterations):
         print('-- File Iteration -- {}'.format(f + 1))
         for file in filenames:
             print('-- New File -- {}'.format(file))
-            shuffled_data_flat, shuffled_one_hot = load_data(file, scaler)
+            if not load_on_start:
+                shuffled_data_flat, shuffled_one_hot = load_data(file, scaler)
             if train_count is None:
                 train_count = len(shuffled_one_hot)
             batches = int(math.floor(train_count / batch_size))
@@ -49,8 +72,11 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
                 loss.append(metrics[0])
                 acc.append(metrics[1])
                 k.append(metrics[2])
-            shuffled_data_flat, shuffled_one_hot = load_data(train_names[0], scaler)
-            scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
+            if not load_on_start:
+                shuffled_data_flat, shuffled_one_hot = load_data(train_names[0], scaler)
+                scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
+            else:
+                scores = model.evaluate(train_shuffled_data_flat, train_shuffled_one_hot)
             ev.append(list(scores))
             print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
             print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
@@ -224,4 +250,4 @@ if __name__ == '__main__':
         uuid = 'model'
     # train_lstm(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
     # train_conv(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
-    train_model(files, train_names, 512, 2, 3, uuid=uuid)
+    train_model(files, train_names, 512, 2, 3, uuid=uuid, load_on_start=True)
