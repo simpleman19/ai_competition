@@ -18,22 +18,22 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
     acc = []
     ev = []
     k = []
-    shuffled_data_flat = None
-    shuffled_one_hot = None
-    train_shuffled_data_flat = None
-    train_shuffled_one_hot = None
-    temp_data, temp_one_hot = None, None
+    num_of_vals = 288000
     if load_on_start:
+        shuffled_data_flat = numpy.zeros(num_of_vals * len(filenames), 2048)
+        shuffled_one_hot = numpy.zeros(num_of_vals * len(filenames), 24)
+        train_shuffled_data_flat = None
+        train_shuffled_one_hot = None
+        temp_data, temp_one_hot = None, None
+        count = 0
         print('Loading on startup...')
         for f in filenames:
             print('Loading: ' + f)
-            if shuffled_data_flat is None:
-                shuffled_data_flat, shuffled_one_hot = load_data(f, scaler)
-            else:
-                temp_data, temp_one_hot = load_data(f, scaler)
-                shuffled_data_flat = numpy.concatenate((shuffled_data_flat, temp_data), axis=0)
-                shuffled_one_hot = numpy.concatenate((shuffled_one_hot, temp_one_hot), axis=0)
-                print(shuffled_one_hot.shape)
+            temp_data, temp_one_hot = load_data(f, scaler)
+            for i in range(temp_data.shape[0]):
+                shuffled_data_flat[i + count * num_of_vals] = numpy.asarray(temp_data[i]) 
+                shuffled_one_hot[i + count * num_of_vals] = numpy.asarray(temp_one_hot[i]) 
+            count += 1
         for f in train_names:
             print('Loading: ' + f)
             if shuffled_data_flat is None:
