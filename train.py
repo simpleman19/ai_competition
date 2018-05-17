@@ -19,13 +19,13 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
     acc = []
     ev = []
     k = []
+    train_shuffled_data_flat = None
+    train_shuffled_one_hot = None
+    temp_data, temp_one_hot = None, None
     num_of_vals = 288000
     if load is not None:
         shuffled_data_flat = numpy.zeros((num_of_vals * len(filenames), 2048), dtype=float)
         shuffled_one_hot = numpy.zeros((num_of_vals * len(filenames), 24), dtype=float)
-        train_shuffled_data_flat = None
-        train_shuffled_one_hot = None
-        temp_data, temp_one_hot = None, None
         count = 0
         print('Loading on startup...')
         for f in filenames:
@@ -35,17 +35,17 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
                 shuffled_data_flat[i + count * num_of_vals] = numpy.asarray(temp_data[i]) 
                 shuffled_one_hot[i + count * num_of_vals] = numpy.asarray(temp_one_hot[i]) 
             count += 1
-        for f in train_names:
-            print('Loading: ' + f)
-            if shuffled_data_flat is None:
-                train_shuffled_data_flat, train_shuffled_one_hot = load_data(f, scaler)
-            else:
-                temp_data, temp_one_hot = load_data(f, scaler)
-                train_shuffled_data_flat = numpy.concatenate((train_shuffled_data_flat, temp_data), axis=0)
-                train_shuffled_one_hot = numpy.concatenate((train_shuffled_one_hot, temp_one_hot), axis=0)
-        del temp_data, temp_one_hot
         gc.collect()
         filenames = ['Loaded_On_Startup']
+    for f in train_names:
+        print('Loading: ' + f)
+        if train_shuffled_data_flat is None:
+            train_shuffled_data_flat, train_shuffled_one_hot = load_data(f, scaler)
+        else:
+            temp_data, temp_one_hot = load_data(f, scaler)
+            train_shuffled_data_flat = numpy.concatenate((train_shuffled_data_flat, temp_data), axis=0)
+            train_shuffled_one_hot = numpy.concatenate((train_shuffled_one_hot, temp_one_hot), axis=0)
+    del temp_data, temp_one_hot
     for f in range(0, file_iterations):
         print('-- File Iteration -- {}'.format(f + 1))
         for file in filenames:
@@ -78,11 +78,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
                 loss.append(metrics[0])
                 acc.append(metrics[1])
                 k.append(metrics[2])
-            if load is None:
-                shuffled_data_flat, shuffled_one_hot = load_data(train_names[0], scaler)
-                scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
-            else:
-                scores = model.evaluate(train_shuffled_data_flat, train_shuffled_one_hot)
+            scores = model.evaluate(train_shuffled_data_flat, train_shuffled_one_hot)
             ev.append(list(scores))
             print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
             print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
