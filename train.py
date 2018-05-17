@@ -20,8 +20,8 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
     k = []
     num_of_vals = 288000
     if load_on_start:
-        shuffled_data_flat = numpy.zeros(num_of_vals * len(filenames), 2048)
-        shuffled_one_hot = numpy.zeros(num_of_vals * len(filenames), 24)
+        shuffled_data_flat = numpy.zeros((num_of_vals * len(filenames), 2048), dtype=float)
+        shuffled_one_hot = numpy.zeros((num_of_vals * len(filenames), 24), dtype=float)
         train_shuffled_data_flat = None
         train_shuffled_one_hot = None
         temp_data, temp_one_hot = None, None
