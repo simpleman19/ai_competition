@@ -1,6 +1,8 @@
 import pickle
 import numpy as np
 from sklearn import preprocessing
+import gc
+
 
 def __load(fname):
     TAG = "-"
@@ -87,6 +89,8 @@ def load_data(fname, scaler=None):
         signalData_shuffled = scaler.fit_transform(signalData_shuffled.reshape(signalData_shuffled.shape[0], 2048))
     else:
         signalData_shuffled = signalData_shuffled.reshape(signalData_shuffled.shape[0], 2048)
+
+    gc.collect()
 
     return signalData_shuffled, oneHotLabels_shuffled
 

@@ -5,6 +5,7 @@ import numpy
 import math
 import sys
 import datetime
+import gc
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from load_data import load_data, load_data_lstm, load_data_conv
@@ -43,6 +44,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
                 train_shuffled_data_flat = numpy.concatenate((train_shuffled_data_flat, temp_data), axis=0)
                 train_shuffled_one_hot = numpy.concatenate((train_shuffled_one_hot, temp_one_hot), axis=0)
         del temp_data, temp_one_hot
+        gc.collect()
         filenames = ['Loaded_On_Startup']
     for f in range(0, file_iterations):
         print('-- File Iteration -- {}'.format(f + 1))
