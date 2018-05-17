@@ -13,14 +13,14 @@ from load_data import load_data, load_data_lstm, load_data_conv
 numpy.random.seed(12)
 
 
-def train_model(filenames, train_names, batch_size, epochs, file_iterations, train_count=None, uuid=None, load_on_start=False):
+def train_model(filenames, train_names, batch_size, epochs, file_iterations, train_count=None, uuid=None, load=None):
     model, scaler = compile_model()
     loss = []
     acc = []
     ev = []
     k = []
     num_of_vals = 288000
-    if load_on_start:
+    if load is not None:
         shuffled_data_flat = numpy.zeros((num_of_vals * len(filenames), 2048), dtype=float)
         shuffled_one_hot = numpy.zeros((num_of_vals * len(filenames), 24), dtype=float)
         train_shuffled_data_flat = None
@@ -50,7 +50,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
         print('-- File Iteration -- {}'.format(f + 1))
         for file in filenames:
             print('-- New File -- {}'.format(file))
-            if not load_on_start:
+            if load is None:
                 shuffled_data_flat, shuffled_one_hot = load_data(file, scaler)
             if train_count is None:
                 train_count = len(shuffled_one_hot)
@@ -78,7 +78,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
                 loss.append(metrics[0])
                 acc.append(metrics[1])
                 k.append(metrics[2])
-            if not load_on_start:
+            if load is None:
                 shuffled_data_flat, shuffled_one_hot = load_data(train_names[0], scaler)
                 scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
             else:
@@ -240,7 +240,10 @@ if __name__ == '__main__':
              'rf_data/training_data_chunk_6.pkl',
              'rf_data/training_data_chunk_7.pkl',
              'rf_data/training_data_chunk_8.pkl',
-             'rf_data/training_data_chunk_9.pkl'
+             'rf_data/training_data_chunk_10.pkl',
+             'rf_data/training_data_chunk_11.pkl',
+             'rf_data/training_data_chunk_12.pkl',
+             'rf_data/training_data_chunk_13.pkl',
              ]
     train_names = [
         'rf_data/training_data_chunk_14.pkl',
@@ -252,4 +255,4 @@ if __name__ == '__main__':
         uuid = 'model'
     # train_lstm(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
     # train_conv(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
-    train_model(files, train_names, 512, 2, 6, uuid=uuid, load_on_start=True)
+    train_model(files, train_names, 512, 2, 6, uuid=uuid, load=4)
