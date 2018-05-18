@@ -70,7 +70,7 @@ def __load(fname):
     """ signalData_shuffled, signalLabels_shuffled, oneHotLabels_shuffled """
     # Randomly shuffle data, use predictable seed
     np.random.seed(221)
-    shuffle_indices = np.random.permutation(np.arange(len(signalLabels)))
+    shuffle_indices = np.random.permutation(np.arange(len(oneHotLabels)))
     signalData_shuffled = signalData[shuffle_indices]
     del signalData
     # signalLabels_shuffled = signalLabels[shuffle_indices]
