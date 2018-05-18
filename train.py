@@ -13,7 +13,7 @@ from load_data import load_data, load_data_lstm, load_data_conv
 numpy.random.seed(12)
 
 
-def train_model(filenames, train_names, batch_size, epochs, file_iterations, train_count=None, uuid=None, load=None):
+def train_model(filenames, train_names, batch_size, epochs, file_iterations, train_count=None, uuid=None, load=False):
     model, scaler = compile_model()
     loss = []
     acc = []
@@ -23,7 +23,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
     train_shuffled_one_hot = None
     temp_data, temp_one_hot = None, None
     num_of_vals = 288000
-    if load is not None:
+    if load:
         shuffled_data_flat = numpy.zeros((num_of_vals * len(filenames), 2048), dtype=float)
         shuffled_one_hot = numpy.zeros((num_of_vals * len(filenames), 24), dtype=float)
         count = 0
@@ -35,7 +35,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
                 shuffled_data_flat[i + count * num_of_vals] = numpy.asarray(temp_data[i]) 
                 shuffled_one_hot[i + count * num_of_vals] = numpy.asarray(temp_one_hot[i]) 
             count += 1
-        gc.collect()
+            gc.collect()
         filenames = ['Loaded_On_Startup']
     for f in train_names:
         print('Loading: ' + f)
@@ -50,7 +50,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
         print('-- File Iteration -- {}'.format(f + 1))
         for file in filenames:
             print('-- New File -- {}'.format(file))
-            if load is None:
+            if not load:
                 shuffled_data_flat, shuffled_one_hot = load_data(file, scaler)
             if train_count is None:
                 train_count = len(shuffled_one_hot)
@@ -71,10 +71,10 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
                 metrics = model.train_on_batch(shuffled_data_flat[(batches-1) * batch_size:train_count, :],
                                                shuffled_one_hot[(batches-1) * batch_size:train_count])
                 print('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f} - {:5s} {:1.4f}'.format(train_count,
-                                                                             train_count,
-                                                                             model.metrics_names[0], metrics[0],
-                                                                             model.metrics_names[1], metrics[1],
-                                                                             model.metrics_names[2], metrics[2]))
+                                                                                 train_count,
+                                                                                 model.metrics_names[0], metrics[0],
+                                                                                 model.metrics_names[1], metrics[1],
+                                                                                 model.metrics_names[2], metrics[2]))
                 loss.append(metrics[0])
                 acc.append(metrics[1])
                 k.append(metrics[2])

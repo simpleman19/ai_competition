@@ -32,7 +32,7 @@ def __load(fname):
     # pre-allocate arrays
     signalData = [None] * number_of_examples
     oneHotLabels = [None] * number_of_examples
-    signalLabels = [None] * number_of_examples
+    # signalLabels = [None] * number_of_examples
 
     # for each mod type ... for each snr value ... add to signalData, signalLabels, and create one-Hot vectors
     example_index = 0
@@ -48,7 +48,7 @@ def __load(fname):
 
             for instance in collect:
                 signalData[example_index] = instance
-                signalLabels[example_index] = (modType, snrValue)
+                # signalLabels[example_index] = (modType, snrValue)
                 oneHotLabels[example_index] = oneHotArrays[one_hot_index]
                 example_index += 1
 
@@ -58,11 +58,12 @@ def __load(fname):
         one_hot_index += 1  # keep track of iteration for one hot vector generation
     del dataCube
     del dataCubeKeyIndices
+    gc.collect()
     # convert to np.arrays
     print(TAG + "Converting to numpy arrays...")
     signalData = np.asarray(signalData)
     oneHotLabels = np.asarray(oneHotLabels)
-    signalLabels = np.asarray(signalLabels)
+    # signalLabels = np.asarray(signalLabels)
 
     # Shuffle data
     print(TAG + "Shuffling Data...")
@@ -73,7 +74,7 @@ def __load(fname):
     signalData_shuffled = signalData[shuffle_indices]
     del signalData
     # signalLabels_shuffled = signalLabels[shuffle_indices]
-    del signalLabels
+    # del signalLabels
     oneHotLabels_shuffled = oneHotLabels[shuffle_indices]
     del oneHotLabels
 
