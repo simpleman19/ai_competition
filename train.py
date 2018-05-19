@@ -6,6 +6,7 @@ import math
 import sys
 import datetime
 import gc
+import os
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from load_data import load_data, load_data_lstm, load_data_conv
@@ -22,7 +23,22 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
     train_shuffled_data_flat = None
     train_shuffled_one_hot = None
     temp_data, temp_one_hot = None, None
-    num_of_vals = 288000
+    training_file_name = 'training.temp'
+    e_start = 0
+    e_end = epochs
+    f_start = 0
+    f_end = file_iterations
+    if train_count is None:
+        num_of_vals = 288000
+    else:
+        num_of_vals = train_count
+    time = datetime.datetime.now()
+    scores = (0, 0, 0)
+    if os.path.isfile(training_file_name):
+        with open(training_file_name, 'r') as f:
+            tmp = f.read()
+            e_start, e_end, f_start, f_end, model_file_tmp, uuid = tmp.split(',')
+        model.load_weights(model_file_tmp)
     if load:
         shuffled_data_flat = numpy.zeros((num_of_vals * len(filenames), 2048), dtype=numpy.float32)
         shuffled_one_hot = numpy.zeros((num_of_vals * len(filenames), 24), dtype=numpy.float32)
@@ -31,6 +47,9 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
         for f in filenames:
             print('Loading: ' + f)
             temp_data, temp_one_hot = load_data(f, scaler)
+            if train_count is not None:
+                temp_data = temp_data[:train_count, :]
+                temp_one_hot = temp_one_hot[:train_count, :]
             for i in range(temp_data.shape[0]):
                 shuffled_data_flat[i + count * num_of_vals] = numpy.asarray(temp_data[i], dtype=numpy.float32)
                 shuffled_one_hot[i + count * num_of_vals] = numpy.asarray(temp_one_hot[i], dtype=numpy.float32)
@@ -45,28 +64,31 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
             temp_data, temp_one_hot = load_data(f, scaler)
             train_shuffled_data_flat = numpy.concatenate((train_shuffled_data_flat, temp_data), axis=0)
             train_shuffled_one_hot = numpy.concatenate((train_shuffled_one_hot, temp_one_hot), axis=0)
+    if train_count is not None:
+        train_shuffled_data_flat = train_shuffled_data_flat[:train_count, :]
+        train_shuffled_one_hot = train_shuffled_one_hot[:train_count, :]
     del temp_data, temp_one_hot
-    for f in range(0, file_iterations):
+    for f in range(f_start, f_end):
         print('-- File Iteration -- {}'.format(f + 1))
         for file in filenames:
             print('-- New File -- {}'.format(file))
             if not load:
                 shuffled_data_flat, shuffled_one_hot = load_data(file, scaler)
-            if train_count is None:
+            if load:
                 train_count = len(shuffled_one_hot)
             batches = int(math.floor(train_count / batch_size))
-            for e in range(0, epochs):
+            for e in range(e_start, e_end):
                 print('Epoch {}/{}'.format(e+1, epochs))
                 for i in range(0, batches - 1):
                     metrics = model.train_on_batch(shuffled_data_flat[i*batch_size:(i+1)*batch_size, :],
                                                    shuffled_one_hot[i*batch_size:(i+1)*batch_size])
-                    print_metrics((i+1)*batch_size, train_count, model, metrics)
+                    print_metrics((i+1)*batch_size, train_count, model, metrics, scores, e)
                     loss.append(metrics[0])
                     acc.append(metrics[1])
                     k.append(metrics[2])
                 metrics = model.train_on_batch(shuffled_data_flat[(batches-1) * batch_size:train_count, :],
                                                shuffled_one_hot[(batches-1) * batch_size:train_count])
-                print_metrics(train_count, train_count, model, metrics)
+                print_metrics(train_count, train_count, model, metrics, scores, e)
                 loss.append(metrics[0])
                 acc.append(metrics[1])
                 k.append(metrics[2])
@@ -74,21 +96,32 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
                 ev.append(list(scores))
                 print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
                 print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
-    time = datetime.datetime.now()
+                model_file = '{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=time,
+                                                                                    score=scores[1] * 100)
+                model.save(model_file)
+                with open(training_file_name, 'w') as file:
+                    file.write("{},{},{},{},{},{}".format(e, e_end, f, f_end, model_file, uuid))
+            e_start = 0
     shuffled_data_flat, shuffled_one_hot = load_data(train_names[0])
     scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
     model.save('{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=time, score=scores[1] * 100))
     print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
     print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
+    os.remove(training_file_name)
     plot(loss, acc, numpy.asarray(ev), k, time, uuid)
 
 
-def print_metrics(step, total, model, metrics):
-    print('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f} - {:5s} {:1.4f}'.format(step,
+def print_metrics(step, total, model, metrics, scores, e):
+    print(('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f} - {:5s} {:1.4f}' +
+           ' - {:7s} {:1.4f} - {:7s} {:1.4f} - {:8s} {:1.4f} - epoch {}').format(step,
                                                                                  total,
                                                                                  model.metrics_names[0], metrics[0],
                                                                                  model.metrics_names[1], metrics[1],
-                                                                                 model.metrics_names[2], metrics[2]))
+                                                                                 model.metrics_names[2], metrics[2],
+                                                                                 'lst los', scores[0],
+                                                                                 'lst acc', scores[1],
+                                                                                 'lst top_2', scores[2],
+                                                                                 e))
 
 
 def train_lstm(filenames, train_names, batch_size, epochs, file_iterations, train_count=None, uuid=None, evaluate=True):
@@ -108,30 +141,22 @@ def train_lstm(filenames, train_names, batch_size, epochs, file_iterations, trai
             for e in range(0, epochs):
                 print('Epoch {}/{}'.format(e+1, epochs))
                 for i in range(0, batches - 1):
-                    metrics = model.train_on_batch(shuffled_data_flat[i*batch_size:(i+1)*batch_size, :],
-                                                   shuffled_one_hot[i*batch_size:(i+1)*batch_size])
-                    print('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f} - {:5s} {:1.4f}'.format((i+1)*batch_size,
-                                                                                 train_count,
-                                                                                 model.metrics_names[0], metrics[0],
-                                                                                 model.metrics_names[1], metrics[1],
-                                                                                 model.metrics_names[2], metrics[2]))
+                    metrics = model.train_on_batch(shuffled_data_flat[i * batch_size:(i + 1) * batch_size, :],
+                                                   shuffled_one_hot[i * batch_size:(i + 1) * batch_size])
+                    print_metrics((i + 1) * batch_size, train_count, model, metrics)
                     loss.append(metrics[0])
                     acc.append(metrics[1])
                     k.append(metrics[2])
-                metrics = model.train_on_batch(shuffled_data_flat[(batches-1) * batch_size:train_count, :],
-                                               shuffled_one_hot[(batches-1) * batch_size:train_count])
-                print('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f} - {:5s} {:1.4f}'.format(train_count,
-                                                                             train_count,
-                                                                             model.metrics_names[0], metrics[0],
-                                                                             model.metrics_names[1], metrics[1],
-                                                                             model.metrics_names[2], metrics[2]))
+                metrics = model.train_on_batch(shuffled_data_flat[(batches - 1) * batch_size:train_count, :],
+                                               shuffled_one_hot[(batches - 1) * batch_size:train_count])
+                print_metrics(train_count, train_count, model, metrics)
                 loss.append(metrics[0])
                 acc.append(metrics[1])
                 k.append(metrics[2])
             if evaluate:
                 shuffled_data_flat, shuffled_one_hot = load_data_lstm(train_names[0])
                 scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
-                ev.append(scores)
+                ev.append(list(scores))
                 print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
                 print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
             del shuffled_data_flat
@@ -242,11 +267,11 @@ if __name__ == '__main__':
     train_names = [
         'rf_data/training_data_chunk_14.pkl',
     ]
-    # files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
+    files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
     if len(sys.argv) > 1:
         uuid = sys.argv[1]
     else:
         uuid = 'model'
     # train_lstm(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
     # train_conv(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
-    train_model(files, train_names, 512, 1, 12, uuid=uuid, load=True)
+    train_model(files, train_names, 512, 4, 5, uuid=uuid, load=True, train_count=1000)

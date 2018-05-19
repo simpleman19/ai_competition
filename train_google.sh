@@ -11,6 +11,15 @@ sleep 30
 host=$(gcloud compute instances describe ${name} --zone=${zone} | grep natIP: | sed 's/:/\n/g' | sed "s/ //g" | sed -n 2p)
 fi
 
+scp -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host}:'/home/chancert413_gmail_com/ai_competition/training.tmp' tmp/
+if [ $? -eq 0 ];
+then
+ssh -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host} bash -c "'
+cd /home/chancert413_gmail_com/ai_competition
+pwd
+. .env/bin/activate
+python3.6 train.py cont > cont.log'"
+fi
 
 lines=`cat ${file}`
 for uuid in ${lines}; do

@@ -28,6 +28,8 @@ wheels/
 *.png
 archive/
 train_list
+*.temp
+*.tmp
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
