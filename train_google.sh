@@ -39,7 +39,9 @@ if [ "$1" == "-d" ]; then
         echo "Didn't find instance to delete"
     else
         echo "Stopping Instance: "
-        gcloud -q compute instances stop ${name} --zone=${zone}
+        ssh -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host} bash -c "'
+sudo shutdown -h
+'"
         ssh-keygen -R ${host}
     fi
 fi
