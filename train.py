@@ -32,8 +32,8 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
             print('Loading: ' + f)
             temp_data, temp_one_hot = load_data(f, scaler)
             for i in range(temp_data.shape[0]):
-                shuffled_data_flat[i + count * num_of_vals] = numpy.asarray(temp_data[i]) 
-                shuffled_one_hot[i + count * num_of_vals] = numpy.asarray(temp_one_hot[i]) 
+                shuffled_data_flat[i + count * num_of_vals] = numpy.asarray(temp_data[i], dtype=numpy.float32)
+                shuffled_one_hot[i + count * num_of_vals] = numpy.asarray(temp_one_hot[i], dtype=numpy.float32)
             count += 1
             gc.collect()
         filenames = ['Loaded_On_Startup']
@@ -82,8 +82,6 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
             ev.append(list(scores))
             print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
             print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
-            del shuffled_data_flat
-            del shuffled_one_hot
     time = datetime.datetime.now()
     shuffled_data_flat, shuffled_one_hot = load_data(train_names[0])
     scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)

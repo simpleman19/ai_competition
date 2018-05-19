@@ -61,8 +61,8 @@ def __load(fname):
     gc.collect()
     # convert to np.arrays
     print(TAG + "Converting to numpy arrays...")
-    signalData = np.asarray(signalData)
-    oneHotLabels = np.asarray(oneHotLabels)
+    signalData = np.asarray(signalData, dtype=np.float32)
+    oneHotLabels = np.asarray(oneHotLabels, dtype=np.float32)
     # signalLabels = np.asarray(signalLabels)
 
     # Shuffle data
