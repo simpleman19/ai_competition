@@ -23,7 +23,12 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
     train_shuffled_data_flat = None
     train_shuffled_one_hot = None
     temp_data, temp_one_hot = None, None
+    model_file = None
     training_file_name = 'training.temp'
+    loss_array_fname = 'loss.temp'
+    acc_array_fname = 'acc.temp'
+    ev_array_fname = 'ev.temp'
+    k_array_fname = 'k.temp'
     e_start = 0
     e_end = epochs
     f_start = 0
@@ -36,8 +41,12 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
     scores = (0, 0, 0)
     if os.path.isfile(training_file_name):
         with open(training_file_name, 'r') as f:
-            tmp = f.read()
+            tmp = f.readline()
             e_start, e_end, f_start, f_end, model_file_tmp, uuid = tmp.split(',')
+        loss = numpy.load(loss_array_fname + '.npy').tolist()
+        acc = numpy.load(acc_array_fname + '.npy').tolist()
+        ev = numpy.load(ev_array_fname + '.npy').tolist()
+        k = numpy.load(k_array_fname + '.npy').tolist()
         model.load_weights(model_file_tmp)
     if load:
         shuffled_data_flat = numpy.zeros((num_of_vals * len(filenames), 2048), dtype=numpy.float32)
@@ -69,9 +78,9 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
         train_shuffled_one_hot = train_shuffled_one_hot[:train_count, :]
     del temp_data, temp_one_hot
     for f in range(int(f_start), int(f_end)):
-        print('-- File Iteration -- {}'.format(f + 1))
+        print('-- File Iteration {} --'.format(f + 1))
         for file in filenames:
-            print('-- New File -- {}'.format(file))
+            print('-- New File {} --'.format(file))
             if not load:
                 shuffled_data_flat, shuffled_one_hot = load_data(file, scaler)
             if load:
@@ -88,7 +97,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
                     k.append(metrics[2])
                 metrics = model.train_on_batch(shuffled_data_flat[(batches-1) * batch_size:train_count, :],
                                                shuffled_one_hot[(batches-1) * batch_size:train_count])
-                print_metrics(train_count, train_count, model, metrics, scores, e)
+                print_metrics(train_count, train_count, model, metrics, scores, e+1)
                 loss.append(metrics[0])
                 acc.append(metrics[1])
                 k.append(metrics[2])
@@ -96,14 +105,20 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
                 ev.append(list(scores))
                 print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
                 print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
+                if model_file is not None:
+                    os.remove(model_file)
                 model_file = '{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=time,
                                                                                     score=scores[1] * 100)
                 model.save(model_file)
                 with open(training_file_name, 'w') as file:
                     file.write("{},{},{},{},{},{}".format(e+1, e_end, f, f_end, model_file, uuid))
+                numpy.save(loss_array_fname, loss)
+                numpy.save(acc_array_fname, acc)
+                numpy.save(ev_array_fname, ev)
+                numpy.save(k_array_fname, k)
+                print('Current progress saved')
             e_start = 0
-    shuffled_data_flat, shuffled_one_hot = load_data(train_names[0])
-    scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
+    scores = model.evaluate(train_shuffled_data_flat, train_shuffled_one_hot)
     model.save('{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=time, score=scores[1] * 100))
     print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
     print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
@@ -267,11 +282,11 @@ if __name__ == '__main__':
     train_names = [
         'rf_data/training_data_chunk_14.pkl',
     ]
-    files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
+    # files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
     if len(sys.argv) > 1:
         uuid = sys.argv[1]
     else:
         uuid = 'model'
     # train_lstm(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
     # train_conv(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
-    train_model(files, train_names, 512, 4, 5, uuid=uuid, load=True, train_count=1000)
+    train_model(files, train_names, 512, 1, 4, uuid=uuid, load=True)
