@@ -68,7 +68,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
         train_shuffled_data_flat = train_shuffled_data_flat[:train_count, :]
         train_shuffled_one_hot = train_shuffled_one_hot[:train_count, :]
     del temp_data, temp_one_hot
-    for f in range(f_start, f_end):
+    for f in range(int(f_start), int(f_end)):
         print('-- File Iteration -- {}'.format(f + 1))
         for file in filenames:
             print('-- New File -- {}'.format(file))
@@ -77,7 +77,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
             if load:
                 train_count = len(shuffled_one_hot)
             batches = int(math.floor(train_count / batch_size))
-            for e in range(e_start, e_end):
+            for e in range(int(e_start), int(e_end)):
                 print('Epoch {}/{}'.format(e+1, epochs))
                 for i in range(0, batches - 1):
                     metrics = model.train_on_batch(shuffled_data_flat[i*batch_size:(i+1)*batch_size, :],
@@ -100,7 +100,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
                                                                                     score=scores[1] * 100)
                 model.save(model_file)
                 with open(training_file_name, 'w') as file:
-                    file.write("{},{},{},{},{},{}".format(e, e_end, f, f_end, model_file, uuid))
+                    file.write("{},{},{},{},{},{}".format(e+1, e_end, f, f_end, model_file, uuid))
             e_start = 0
     shuffled_data_flat, shuffled_one_hot = load_data(train_names[0])
     scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
