@@ -7,7 +7,7 @@ host=$(gcloud compute instances describe ${name} --zone=${zone} | grep natIP: | 
 if [ -z "$host" ]; then
 echo "Starting Instance"
 gcloud -q compute instances start ${name} --zone=${zone}
-sleep 30
+sleep 60
 host=$(gcloud compute instances describe ${name} --zone=${zone} | grep natIP: | sed 's/:/\n/g' | sed "s/ //g" | sed -n 2p)
 fi
 
