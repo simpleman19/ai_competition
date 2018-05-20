@@ -15,6 +15,7 @@ numpy.random.seed(12)
 
 
 def train_model(filenames, train_names, batch_size, epochs, file_iterations, train_count=None, uuid=None, load=False):
+    tf.Session(config=tf.ConfigProto(log_device_placement=True))
     model, scaler = compile_model()
     loss = []
     acc = []
