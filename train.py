@@ -15,7 +15,8 @@ numpy.random.seed(12)
 
 
 def train_model(filenames, train_names, batch_size, epochs, file_iterations, train_count=None, uuid=None, load=False):
-    tf.Session(config=tf.ConfigProto(log_device_placement=True))
+    session = tf.Session(config=tf.ConfigProto(log_device_placement=True))
+    session = None
     model, scaler = compile_model()
     loss = []
     acc = []
@@ -290,4 +291,4 @@ if __name__ == '__main__':
         uuid = 'model'
     # train_lstm(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
     # train_conv(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
-    train_model(files, train_names, 512, 1, 4, uuid=uuid, load=True)
+    train_model(files, train_names, 1024, 1, 10, uuid=uuid, load=True)
