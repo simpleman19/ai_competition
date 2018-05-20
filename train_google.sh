@@ -11,7 +11,7 @@ sleep 30
 host=$(gcloud compute instances describe ${name} --zone=${zone} | grep natIP: | sed 's/:/\n/g' | sed "s/ //g" | sed -n 2p)
 fi
 
-scp -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host}:'/home/chancert413_gmail_com/ai_competition/training.tmp' tmp/
+scp -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host}:'/home/chancert413_gmail_com/ai_competition/training.temp' tmp/
 if [ $? -eq 0 ];
 then
 ssh -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host} bash -c "'
