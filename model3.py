@@ -1,7 +1,7 @@
 from keras.models import Sequential
 from keras.layers import TimeDistributed, Dense, Dropout, LSTM, PReLU, ELU
 from keras.optimizers import Adam, SGD
-from keras.backend import relu, elu
+from keras.backend import relu
 from keras.metrics import top_k_categorical_accuracy
 from sklearn import preprocessing
 from keras import regularizers
