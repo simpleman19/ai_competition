@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, PReLU
+from keras.layers import Dense, Dropout, PReLU, BatchNormalization
 from keras.backend import relu
 from keras.optimizers import Adam
 from keras.metrics import top_k_categorical_accuracy
@@ -24,6 +24,7 @@ def compile_model():
     model.add(PReLU())
     model.add(Dense(12288, activation='linear'))
     model.add(PReLU())
+    model.add(BatchNormalization())
     model.add(Dropout(.1))
     model.add(Dense(12288, activation='linear'))
     model.add(PReLU())
