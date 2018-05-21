@@ -291,4 +291,4 @@ if __name__ == '__main__':
         uuid = 'model'
     # train_lstm(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
     # train_conv(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
-    train_model(files, train_names, 1024, 1, 10, uuid=uuid, load=True)
+    train_model(files, train_names, 1024, 1, 6, uuid=uuid, load=True)
