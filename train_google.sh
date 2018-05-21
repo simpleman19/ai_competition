@@ -51,7 +51,7 @@ if [ "$1" == "-d" ]; then
     else
         echo "Stopping Instance: "
         ssh -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host} bash -c "'
-sudo shutdown -h
+sudo shutdown -h now
 '"
         ssh-keygen -R ${host}
     fi
