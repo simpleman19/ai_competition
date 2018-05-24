@@ -93,13 +93,13 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
                 for i in range(0, batches - 1):
                     metrics = model.train_on_batch(shuffled_data_flat[i*batch_size:(i+1)*batch_size, :],
                                                    shuffled_one_hot[i*batch_size:(i+1)*batch_size])
-                    print_metrics((i+1)*batch_size, train_count, model, metrics, scores, e)
+                    print_metrics((i+1)*batch_size, train_count, model, metrics, scores, e+1, f+1)
                     loss.append(metrics[0])
                     acc.append(metrics[1])
                     k.append(metrics[2])
                 metrics = model.train_on_batch(shuffled_data_flat[(batches-1) * batch_size:train_count, :],
                                                shuffled_one_hot[(batches-1) * batch_size:train_count])
-                print_metrics(train_count, train_count, model, metrics, scores, e+1)
+                print_metrics(train_count, train_count, model, metrics, scores, e+1, f+1)
                 loss.append(metrics[0])
                 acc.append(metrics[1])
                 k.append(metrics[2])
@@ -128,17 +128,18 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, tra
     plot(loss, acc, numpy.asarray(ev), k, time, uuid)
 
 
-def print_metrics(step, total, model, metrics, scores, e):
+def print_metrics(step, total, model, metrics, scores, e, f):
     print(('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f} - {:5s} {:1.4f}' +
-           ' - {:7s} {:1.4f} - {:7s} {:1.4f} - {:8s} {:1.4f} - epoch {}').format(step,
-                                                                                 total,
-                                                                                 model.metrics_names[0], metrics[0],
-                                                                                 model.metrics_names[1], metrics[1],
-                                                                                 model.metrics_names[2], metrics[2],
-                                                                                 'lst los', scores[0],
-                                                                                 'lst acc', scores[1],
-                                                                                 'lst top_2', scores[2],
-                                                                                 e))
+           ' - {:7s} {:1.4f} - {:7s} {:1.4f} - {:8s} {:1.4f}' +
+           ' - epoch {} - iter {}').format(step,
+                                           total,
+                                           model.metrics_names[0], metrics[0],
+                                           model.metrics_names[1], metrics[1],
+                                           model.metrics_names[2], metrics[2],
+                                           'lst los', scores[0],
+                                           'lst acc', scores[1],
+                                           'lst top_2', scores[2],
+                                           e, f))
 
 
 def train_lstm(filenames, train_names, batch_size, epochs, file_iterations, train_count=None, uuid=None, evaluate=True):
@@ -147,6 +148,7 @@ def train_lstm(filenames, train_names, batch_size, epochs, file_iterations, trai
     acc = []
     ev = []
     k = []
+    scores = (0, 0, 0)
     for f in range(0, file_iterations):
         print('-- File Iteration -- {}'.format(f + 1))
         for file in filenames:
@@ -160,13 +162,13 @@ def train_lstm(filenames, train_names, batch_size, epochs, file_iterations, trai
                 for i in range(0, batches - 1):
                     metrics = model.train_on_batch(shuffled_data_flat[i * batch_size:(i + 1) * batch_size, :],
                                                    shuffled_one_hot[i * batch_size:(i + 1) * batch_size])
-                    print_metrics((i + 1) * batch_size, train_count, model, metrics)
+                    print_metrics((i + 1) * batch_size, train_count, model, metrics, scores, e+1, f)
                     loss.append(metrics[0])
                     acc.append(metrics[1])
                     k.append(metrics[2])
                 metrics = model.train_on_batch(shuffled_data_flat[(batches - 1) * batch_size:train_count, :],
                                                shuffled_one_hot[(batches - 1) * batch_size:train_count])
-                print_metrics(train_count, train_count, model, metrics)
+                print_metrics(train_count, train_count, model, metrics, scores, e+1, f)
                 loss.append(metrics[0])
                 acc.append(metrics[1])
                 k.append(metrics[2])
