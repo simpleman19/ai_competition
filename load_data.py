@@ -96,7 +96,7 @@ def load_data(fname, scaler=None):
     return signalData_shuffled, oneHotLabels_shuffled
 
 
-def load_data_lstm(fname):
+def load_data_lstm(fname, scaler=None):
     '''  Load dataset from pickled file '''
 
     signalData_shuffled, oneHotLabels_shuffled = __load(fname)
@@ -106,7 +106,7 @@ def load_data_lstm(fname):
     return signalData_shuffled_flat, oneHotLabels_shuffled
 
 
-def load_data_conv(fname):
+def load_data_conv(fname, scaler=None):
     '''  Load dataset from pickled file '''
 
     signalData_shuffled, oneHotLabels_shuffled = __load(fname)

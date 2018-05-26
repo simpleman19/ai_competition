@@ -17,10 +17,13 @@ def relu_max(x):
 
 def compile_model():
     model = Sequential()
-    model.add(LSTM(64, input_shape=(1024, 2), activation='tanh'))
+    model.add(LSTM(256, input_shape=(1024, 2), activation='tanh'))
+    model.add(Dense(128, activation='linear'))
+    model.add(PReLU())
     model.add(Dense(24, activation='softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', top_2])
-    return model
+    adam = Adam(lr=.0005, beta_1=.9, beta_2=.98, decay=0, amsgrad=True)
+    model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy', top_2])
+    return model, None
 
 
 if __name__ == '__main__':

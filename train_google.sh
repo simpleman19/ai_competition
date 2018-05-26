@@ -18,7 +18,7 @@ ssh -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host} bash -c "'
 cd /home/chancert413_gmail_com/ai_competition
 pwd
 . .env/bin/activate
-python3.6 train.py cont > cont.log'"
+python3.6 train.py cont'"
 fi
 
 lines=`cat ${file}`
@@ -31,7 +31,7 @@ git checkout master
 git pull
 git checkout ${uuid}
 pip install -r requirements.txt
-python3.6 train.py ${uuid} > ${uuid}.log'"
+python3.6 train.py ${uuid}'"
 done
 
 scp -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host}:'/home/chancert413_gmail_com/ai_competition/*.{h5,png,log}' archive/
