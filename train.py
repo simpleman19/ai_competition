@@ -14,6 +14,17 @@ from load_data import load_data, load_data_lstm, load_data_conv
 numpy.random.seed(12)
 
 
+class Tee(object):
+    def __init__(self, *files):
+        self.files = files
+    def write(self, obj):
+        for f in self.files:
+            f.write(obj)
+    def flush(self) :
+        for f in self.files:
+            f.flush()
+
+
 def train_model(filenames, train_names, batch_size, epochs, file_iterations, loader, train_count=None, uuid=None, load=False):
     session = tf.Session(config=tf.ConfigProto(log_device_placement=True))
     session = None
@@ -143,18 +154,19 @@ def print_metrics(step, total, model, metrics, scores, e, f):
     sys.stdout.flush()
 
 
-def save_progress(l):
-    if l.model_file is not None:
-        os.remove(l.model_file)
-    model_file = '{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=l.time,
-                                                                          score=l.scores[1] * 100)
-    l.model.save(model_file)
-    with open(l.training_file_name, 'w') as file:
-        file.write("{},{},{},{},{},{}".format(l.e + 1, l.e_end, l.f, l.f_end, model_file, uuid))
-    numpy.save(l.loss_array_fname, l.loss)
-    numpy.save(l.acc_array_fname, l.acc)
-    numpy.save(l.ev_array_fname, l.ev)
-    numpy.save(l.k_array_fname, l.k)
+def save_progress(**l):
+
+    if l['model_file'] is not None:
+        os.remove(l['model_file'])
+    model_file = '{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=l['uuid'], date=l['time'],
+                                                                          score=l['scores'][1] * 100)
+    l['model'].save(model_file)
+    with open(l['training_file_name'], 'w') as file:
+        file.write("{},{},{},{},{},{}".format(l['e'] + 1, l['e_end'], l['f'], l['f_end'], model_file, l['uuid']))
+    numpy.save(l['loss_array_fname'], l['loss'])
+    numpy.save(l['acc_array_fname'], l['acc'])
+    numpy.save(l['ev_array_fname'], l['ev'])
+    numpy.save(l['k_array_fname'], l['k'])
     print('Current progress saved')
 
 
@@ -255,7 +267,12 @@ if __name__ == '__main__':
     train_names = [
         'rf_data/training_data_chunk_14.pkl',
     ]
-    # files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
+    train_count = None
+    iters = 6
+    if os.uname()[1] == 'laptop':
+        files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
+        train_count = 10000
+        iters = 2
     training_file_name = 'training.temp'
     uuid = None
     if os.path.isfile(training_file_name):
@@ -270,6 +287,6 @@ if __name__ == '__main__':
         with open(uuid + '.log', 'w') as f:
             f.write('Starting training')
     with open(uuid + '.log', 'a') as f:
-        sys.stdout = f
-        train_model(files, train_names, 512, 1, 6, load_data, uuid=uuid, load=True)
+        sys.stdout = Tee(sys.stdout, f)
+        train_model(files, train_names, 512, 1, iters, load_data, uuid=uuid, load=True, train_count=train_count)
     # train_conv(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
