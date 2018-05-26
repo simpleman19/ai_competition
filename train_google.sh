@@ -14,6 +14,7 @@ fi
 scp -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host}:'/home/chancert413_gmail_com/ai_competition/training.temp' tmp/
 if [ $? -eq 0 ];
 then
+rm tmp/training.temp
 ssh -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host} bash -c "'
 cd /home/chancert413_gmail_com/ai_competition
 pwd
