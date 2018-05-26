@@ -1,6 +1,6 @@
 import matplotlib
 matplotlib.use('Agg')
-from model2 import compile_model
+from model3 import compile_model
 import numpy
 import math
 import sys
@@ -268,7 +268,7 @@ if __name__ == '__main__':
         'rf_data/training_data_chunk_14.pkl',
     ]
     train_count = None
-    iters = 6
+    iters = 3
     if os.uname()[1] == 'laptop':
         files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
         train_count = 10000
@@ -288,5 +288,5 @@ if __name__ == '__main__':
             f.write('Starting training')
     with open(uuid + '.log', 'a') as f:
         sys.stdout = Tee(sys.stdout, f)
-        train_model(files, train_names, 512, 1, iters, load_data, uuid=uuid, load=True, train_count=train_count)
+        train_model(files, train_names, 512, 1, iters, load_data_lstm, uuid=uuid, load=True, train_count=train_count)
     # train_conv(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
