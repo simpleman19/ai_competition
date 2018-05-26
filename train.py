@@ -214,7 +214,7 @@ if __name__ == '__main__':
         'rf_data/training_data_chunk_14.pkl',
     ]
     train_count = None
-    iters = 6
+    iters = 10
 
     # Modifications to test on laptop
     if os.uname()[1] == 'laptop':
