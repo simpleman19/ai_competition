@@ -1,6 +1,6 @@
 import matplotlib
 matplotlib.use('Agg')
-from model3 import compile_model
+from model2 import compile_model
 import numpy
 import math
 import sys
@@ -271,5 +271,5 @@ if __name__ == '__main__':
             f.write('Starting training')
     with open(uuid + '.log', 'a') as f:
         sys.stdout = f
-        train_model(files, train_names, 512, 1, 3, load_data_lstm, uuid=uuid, load=True)
+        train_model(files, train_names, 512, 1, 6, load_data, uuid=uuid, load=True)
     # train_conv(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
