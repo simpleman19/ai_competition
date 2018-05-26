@@ -37,7 +37,6 @@ done
 
 scp -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host}:'/home/chancert413_gmail_com/ai_competition/*.{h5,png,log}' archive/
 ssh -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host} bash -c "'
-rm /home/chancert413_gmail_com/ai_competition/*.h5
 rm /home/chancert413_gmail_com/ai_competition/*.png
 rm /home/chancert413_gmail_com/ai_competition/*.log
 rm /home/chancert413_gmail_com/ai_competition/*.temp

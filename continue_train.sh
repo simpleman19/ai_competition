@@ -13,7 +13,7 @@ sleep 60
 host=$(gcloud compute instances describe ${name} --zone=${zone} | grep natIP: | sed 's/:/\n/g' | sed "s/ //g" | sed -n 2p)
 fi
 
-scp -i ~/.ssh/google_compute_engine archive/${mf} chancert413_gmail_com@${host}:'/home/chancert413_gmail_com/ai_competition/'
+scp -i ~/.ssh/google_compute_engine "archive/${mf}" chancert413_gmail_com@${host}:'/home/chancert413_gmail_com/ai_competition/'
 
 ssh -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host} bash -c "'
 cd /home/chancert413_gmail_com/ai_competition
@@ -23,11 +23,10 @@ git checkout master
 git pull
 git checkout ${uuid}
 pip install -r requirements.txt
-python3.6 train.py ${uuid} ${mf}'"
+python3.6 train.py ${uuid} \"${mf}\"'"
 
 scp -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host}:'/home/chancert413_gmail_com/ai_competition/*.{h5,png,log}' archive/
 ssh -i ~/.ssh/google_compute_engine chancert413_gmail_com@${host} bash -c "'
-rm /home/chancert413_gmail_com/ai_competition/*.h5
 rm /home/chancert413_gmail_com/ai_competition/*.png
 rm /home/chancert413_gmail_com/ai_competition/*.log
 rm /home/chancert413_gmail_com/ai_competition/*.temp

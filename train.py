@@ -132,7 +132,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
                 model_file = save_progress(**locals())
             e_start = 0
     scores = model.evaluate(train_shuffled_data_flat, train_shuffled_one_hot)
-    model.save('{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=time, score=scores[1] * 100))
+    model.save('{date:%Y-%m-%d_%H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=time, score=scores[1] * 100))
     print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
     print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
     os.remove(training_file_name)
@@ -157,7 +157,7 @@ def print_metrics(step, total, model, metrics, scores, e, f):
 def save_progress(**l):
     if l['model_file'] is not None:
         os.remove(l['model_file'])
-    model_file = '{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=l['uuid'], date=l['time'],
+    model_file = '{date:%Y-%m-%d_%H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=l['uuid'], date=l['time'],
                                                                           score=l['scores'][1] * 100)
     l['model'].save(model_file)
     with open(l['training_file_name'], 'w') as file:
