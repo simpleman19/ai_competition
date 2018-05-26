@@ -4,6 +4,7 @@ from keras.backend import relu
 from keras.optimizers import Adam
 from keras.metrics import top_k_categorical_accuracy
 from sklearn import preprocessing
+from load_data import load_data
 
 
 def top_2(y_true, y_pred):
@@ -25,12 +26,10 @@ def compile_model():
     model.add(Dense(12288, activation='linear'))
     model.add(PReLU())
     model.add(Dropout(.2))
-    model.add(Dense(12288, activation='linear'))
-    model.add(PReLU())
+    model.add(Dense(12288, activation='relu'))
     model.add(BatchNormalization())
     model.add(Dropout(.2))
-    model.add(Dense(12288, activation='linear'))
-    model.add(PReLU())
+    model.add(Dense(12288, activation='sigmoid'))
     model.add(Dropout(.1))
     model.add(Dense(24, activation='softmax'))
     adam = Adam(lr=.0005, beta_1=.9, beta_2=.98, decay=0, amsgrad=True)

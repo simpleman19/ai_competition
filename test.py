@@ -7,7 +7,7 @@ import sys
 import datetime
 import tensorflow as tf
 import matplotlib.pyplot as plt
-from load_data import load_data, load_data_lstm
+from load_data import load_data
 
 
 def test(model_file, test_data, test_labels, count=None):

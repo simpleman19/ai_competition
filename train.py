@@ -1,6 +1,6 @@
 import matplotlib
 matplotlib.use('Agg')
-from model3 import compile_model
+from model2 import compile_model, load_data
 import numpy
 import math
 import sys
@@ -9,7 +9,6 @@ import gc
 import os
 import tensorflow as tf
 import matplotlib.pyplot as plt
-from load_data import load_data, load_data_lstm, load_data_conv
 
 numpy.random.seed(12)
 
@@ -25,7 +24,7 @@ class Tee(object):
             f.flush()
 
 
-def train_model(filenames, train_names, batch_size, epochs, file_iterations, loader, train_count=None, uuid=None, load=False):
+def train_model(filenames, train_names, batch_size, epochs, file_iterations, loader, train_count=None, uuid=None, load=False, model_file=None):
     session = tf.Session(config=tf.ConfigProto(log_device_placement=True))
     session = None
     model, scaler = compile_model()
@@ -37,7 +36,6 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
     train_shuffled_one_hot = None
     temp_data, temp_one_hot = None, None
     shuffled_data_flat, shuffled_one_hot = None, None
-    model_file = None
     training_file_name = 'training.temp'
     loss_array_fname = 'loss.temp'
     acc_array_fname = 'acc.temp'
@@ -62,6 +60,8 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
         ev = numpy.load(ev_array_fname + '.npy').tolist()
         k = numpy.load(k_array_fname + '.npy').tolist()
         model.load_weights(model_file_tmp)
+    elif model_file is not None:
+        model.load_weights(model_file)
     if load:
         count = 0
         print('Loading on startup...')
@@ -129,7 +129,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
                 ev.append(list(scores))
                 print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
                 print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
-                save_progress(**locals())
+                model_file = save_progress(**locals())
             e_start = 0
     scores = model.evaluate(train_shuffled_data_flat, train_shuffled_one_hot)
     model.save('{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=time, score=scores[1] * 100))
@@ -155,7 +155,6 @@ def print_metrics(step, total, model, metrics, scores, e, f):
 
 
 def save_progress(**l):
-
     if l['model_file'] is not None:
         os.remove(l['model_file'])
     model_file = '{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=l['uuid'], date=l['time'],
@@ -168,60 +167,7 @@ def save_progress(**l):
     numpy.save(l['ev_array_fname'], l['ev'])
     numpy.save(l['k_array_fname'], l['k'])
     print('Current progress saved')
-
-
-def train_conv(filenames, train_names, batch_size, epochs, file_iterations, train_count=None, uuid=None, evaluate=True):
-    model = compile_model()
-    loss = []
-    acc = []
-    ev = []
-    k = []
-    for f in range(0, file_iterations):
-        print('-- File Iteration -- {}'.format(f + 1))
-        for file in filenames:
-            print('-- New File -- {}'.format(file))
-            shuffled_data_flat, shuffled_one_hot = load_data_conv(file)
-            if train_count is None:
-                train_count = len(shuffled_one_hot)
-            batches = int(math.floor(train_count / batch_size))
-            for e in range(0, epochs):
-                print('Epoch {}/{}'.format(e+1, epochs))
-                for i in range(0, batches - 1):
-                    metrics = model.train_on_batch(shuffled_data_flat[i*batch_size:(i+1)*batch_size, :],
-                                                   shuffled_one_hot[i*batch_size:(i+1)*batch_size])
-                    print('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f} - {:5s} {:1.4f}'.format((i+1)*batch_size,
-                                                                                 train_count,
-                                                                                 model.metrics_names[0], metrics[0],
-                                                                                 model.metrics_names[1], metrics[1],
-                                                                                 model.metrics_names[2], metrics[2]))
-                    loss.append(metrics[0])
-                    acc.append(metrics[1])
-                    k.append(metrics[2])
-                metrics = model.train_on_batch(shuffled_data_flat[(batches-1) * batch_size:train_count, :],
-                                               shuffled_one_hot[(batches-1) * batch_size:train_count])
-                print('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f} - {:5s} {:1.4f}'.format(train_count,
-                                                                             train_count,
-                                                                             model.metrics_names[0], metrics[0],
-                                                                             model.metrics_names[1], metrics[1],
-                                                                             model.metrics_names[2], metrics[2]))
-                loss.append(metrics[0])
-                acc.append(metrics[1])
-                k.append(metrics[2])
-            if evaluate:
-                shuffled_data_flat, shuffled_one_hot = load_data_conv(train_names[0])
-                scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
-                ev.append(scores)
-                print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
-                print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
-            del shuffled_data_flat
-            del shuffled_one_hot
-    time = datetime.datetime.now()
-    shuffled_data_flat, shuffled_one_hot = load_data_conv(train_names[0])
-    scores = model.evaluate(shuffled_data_flat, shuffled_one_hot)
-    model.save('{date:%Y-%m-%d %H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=time, score=scores[1] * 100))
-    print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
-    print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
-    plot(loss, acc, ev, k, time, uuid)
+    return model_file
 
 
 def plot(loss, acc, ev, k, time, uuid):
@@ -268,13 +214,18 @@ if __name__ == '__main__':
         'rf_data/training_data_chunk_14.pkl',
     ]
     train_count = None
-    iters = 3
+    iters = 6
+
+    # Modifications to test on laptop
     if os.uname()[1] == 'laptop':
         files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
         train_count = 10000
         iters = 2
-    training_file_name = 'training.temp'
+
+    # get uuid
     uuid = None
+    training_file_name = 'training.temp'
+    model_file = None
     if os.path.isfile(training_file_name):
         with open(training_file_name, 'r') as f:
             tmp = f.readline()
@@ -283,10 +234,16 @@ if __name__ == '__main__':
         uuid = sys.argv[1]
     elif uuid is None:
         uuid = 'model'
+    if len(sys.argv) > 2:
+        model_file = sys.argv[2]
+
+    # Check for existing log and if not create it
     if not os.path.isfile(uuid + '.log'):
         with open(uuid + '.log', 'w') as f:
             f.write('Starting training')
+
+    # Train with log and tee output
     with open(uuid + '.log', 'a') as f:
         sys.stdout = Tee(sys.stdout, f)
-        train_model(files, train_names, 512, 1, iters, load_data_lstm, uuid=uuid, load=True, train_count=train_count)
+        train_model(files, train_names, 512, 1, iters, load_data, uuid=uuid, load=True, model_file=model_file, train_count=train_count)
     # train_conv(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)

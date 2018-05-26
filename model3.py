@@ -5,6 +5,7 @@ from keras.backend import relu
 from keras.metrics import top_k_categorical_accuracy
 from sklearn import preprocessing
 from keras import regularizers
+from load_data import load_data_lstm as load_data
 
 
 def top_2(y_true, y_pred):
