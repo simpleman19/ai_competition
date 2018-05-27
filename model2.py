@@ -4,6 +4,7 @@ from keras.backend import relu
 from keras.optimizers import Adam
 from keras.metrics import top_k_categorical_accuracy
 from sklearn import preprocessing
+import numpy
 from load_data import load_data
 
 
@@ -18,8 +19,8 @@ def relu_max(x):
 def compile_model():
     scaler = None
     model = Sequential()
-    model.add(Dense(2048,
-                    input_dim=2048,
+    model.add(Dense(3072,
+                    input_dim=3072,
                     activation='linear'
                     ))
     model.add(PReLU())
@@ -30,8 +31,17 @@ def compile_model():
     model.add(Dense(24, activation='softmax'))
     adam = Adam(lr=.0005, beta_1=.9, beta_2=.98, decay=0, amsgrad=True)
     model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy', top_2])
-    scaler = preprocessing.Normalizer()
+    scaler = Scaler(preprocessing.Normalizer())
     return model, scaler
+
+
+class Scaler:
+    def __init__(self, scaler):
+        self.scaler = scaler
+
+    def fit_transform(self, array):
+        temp = self.scaler.fit_transform(array[:, :1024])
+        return numpy.concatenate((array, temp), axis=1)
 
 
 if __name__ == '__main__':
