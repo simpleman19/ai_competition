@@ -79,11 +79,11 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
                 shape_one_hot = list(temp_one_hot.shape)
                 shape_one_hot[0] = shape_one_hot[0] * len(filenames)
                 shape_one_hot = tuple(shape_one_hot)
-                shuffled_data_flat = numpy.zeros(shape, dtype=numpy.float32)
-                shuffled_one_hot = numpy.zeros(shape_one_hot, dtype=numpy.float32)
+                shuffled_data_flat = numpy.zeros(shape, dtype=numpy.float16)
+                shuffled_one_hot = numpy.zeros(shape_one_hot, dtype=numpy.float16)
             for i in range(temp_data.shape[0]):
-                shuffled_data_flat[i + count * num_of_vals] = numpy.asarray(temp_data[i], dtype=numpy.float32)
-                shuffled_one_hot[i + count * num_of_vals] = numpy.asarray(temp_one_hot[i], dtype=numpy.float32)
+                shuffled_data_flat[i + count * num_of_vals] = numpy.asarray(temp_data[i], dtype=numpy.float16)
+                shuffled_one_hot[i + count * num_of_vals] = numpy.asarray(temp_one_hot[i], dtype=numpy.float16)
             count += 1
             gc.collect()
         filenames = ['Loaded_On_Startup']
