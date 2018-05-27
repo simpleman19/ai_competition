@@ -9,6 +9,7 @@ import gc
 import os
 import tensorflow as tf
 import matplotlib.pyplot as plt
+from sklearn.metrics import classification_report
 
 numpy.random.seed(12)
 
@@ -32,6 +33,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
     acc = []
     ev = []
     k = []
+    class_rep = []
     train_shuffled_data_flat = None
     train_shuffled_one_hot = None
     temp_data, temp_one_hot = None, None
@@ -41,6 +43,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
     acc_array_fname = 'acc.temp'
     ev_array_fname = 'ev.temp'
     k_array_fname = 'k.temp'
+    class_array_fname = 'class.temp'
     e_start = 0
     e_end = epochs
     f_start = 0
@@ -59,6 +62,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
         acc = numpy.load(acc_array_fname + '.npy').tolist()
         ev = numpy.load(ev_array_fname + '.npy').tolist()
         k = numpy.load(k_array_fname + '.npy').tolist()
+        class_rep = numpy.load(class_array_fname + 'npy').tolist()
         model.load_weights(model_file_tmp)
     elif model_file is not None:
         model.load_weights(model_file)
@@ -126,6 +130,9 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
                 acc.append(metrics[1])
                 k.append(metrics[2])
                 scores = model.evaluate(train_shuffled_data_flat, train_shuffled_one_hot)
+                report = classification_report(numpy.argmax(train_shuffled_one_hot, axis=1), model.predict_classes(train_shuffled_data_flat))
+                print(report)
+                class_rep.append(report)
                 ev.append(list(scores))
                 print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
                 print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
@@ -135,6 +142,8 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
     model.save('{date:%Y-%m-%d_%H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=time, score=scores[1] * 100))
     print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
     print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
+    for cr in class_rep:
+        print(cr)
     os.remove(training_file_name)
     plot(loss, acc, numpy.asarray(ev), k, time, uuid)
 
@@ -166,6 +175,7 @@ def save_progress(**l):
     numpy.save(l['acc_array_fname'], l['acc'])
     numpy.save(l['ev_array_fname'], l['ev'])
     numpy.save(l['k_array_fname'], l['k'])
+    numpy.save(l['class_array_fname'], l['class_rep'])
     print('Current progress saved')
     return model_file
 
@@ -219,7 +229,7 @@ if __name__ == '__main__':
     # Modifications to test on laptop
     if os.uname()[1] == 'laptop':
         files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
-        train_count = 10000
+        train_count = 1000
         iters = 2
 
     # get uuid
