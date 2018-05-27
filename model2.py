@@ -30,7 +30,7 @@ def compile_model():
     model.add(Dense(24, activation='softmax'))
     adam = Adam(lr=.0005, beta_1=.9, beta_2=.98, decay=0, amsgrad=True)
     model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy', top_2])
-    scaler = preprocessing.MinMaxScaler(feature_range=(-10, 10))
+    scaler = preprocessing.Normalizer()
     return model, scaler
 
 
