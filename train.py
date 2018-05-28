@@ -130,7 +130,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
                 acc.append(metrics[1])
                 k.append(metrics[2])
                 scores = model.evaluate(train_shuffled_data_flat, train_shuffled_one_hot)
-                report = classification_report(numpy.argmax(train_shuffled_one_hot, axis=1), model.predict_classes(train_shuffled_data_flat), labels=labels)
+                report = classification_report(numpy.argmax(train_shuffled_one_hot, axis=1), model.predict_classes(train_shuffled_data_flat), target_names=list(labels))
                 print(report)
                 class_rep.append(report)
                 ev.append(list(scores))
@@ -229,7 +229,7 @@ if __name__ == '__main__':
     # Modifications to test on laptop
     if os.uname()[1] == 'laptop':
         files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
-        train_count = 1000
+        train_count = 5000
         iters = 2
 
     # get uuid
