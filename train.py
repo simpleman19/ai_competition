@@ -255,5 +255,5 @@ if __name__ == '__main__':
     # Train with log and tee output
     with open(uuid + '.log', 'a') as f:
         sys.stdout = Tee(sys.stdout, f)
-        train_model(files, train_names, 512, 1, iters, load_data, uuid=uuid, load=True, model_file=model_file, train_count=train_count)
+        train_model(files, train_names, 128, 1, iters, load_data, uuid=uuid, load=True, model_file=model_file, train_count=train_count)
     # train_conv(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
