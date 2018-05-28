@@ -19,8 +19,8 @@ def relu_max(x):
 def compile_model():
     scaler = None
     model = Sequential()
-    model.add(Dense(3072,
-                    input_dim=3072,
+    model.add(Dense(2048,
+                    input_dim=2048,
                     activation='linear'
                     ))
     model.add(PReLU())
@@ -31,7 +31,7 @@ def compile_model():
     model.add(Dense(24, activation='softmax'))
     adam = Adam(lr=.0005, beta_1=.9, beta_2=.98, decay=0, amsgrad=True)
     model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy', top_2])
-    scaler = Scaler(preprocessing.Normalizer())
+    # scaler = Scaler(preprocessing.Normalizer())
     return model, scaler
 
 

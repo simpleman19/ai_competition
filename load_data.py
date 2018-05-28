@@ -78,13 +78,13 @@ def __load(fname):
     oneHotLabels_shuffled = oneHotLabels[shuffle_indices]
     del oneHotLabels
 
-    return signalData_shuffled, oneHotLabels_shuffled
+    return signalData_shuffled, oneHotLabels_shuffled, modTypes
 
 
 def load_data(fname, scaler=None):
     '''  Load dataset from pickled file '''
 
-    signalData_shuffled, oneHotLabels_shuffled = __load(fname)
+    signalData_shuffled, oneHotLabels_shuffled, modTypes = __load(fname)
 
     if scaler is not None:
         signalData_shuffled = scaler.fit_transform(signalData_shuffled.reshape(signalData_shuffled.shape[0], 2048))
@@ -93,22 +93,22 @@ def load_data(fname, scaler=None):
 
     gc.collect()
 
-    return signalData_shuffled, oneHotLabels_shuffled
+    return signalData_shuffled, oneHotLabels_shuffled, modTypes
 
 
 def load_data_lstm(fname, scaler=None):
     '''  Load dataset from pickled file '''
 
-    signalData_shuffled, oneHotLabels_shuffled = __load(fname)
+    signalData_shuffled, oneHotLabels_shuffled, modTypes = __load(fname)
 
     signalData_shuffled_flat = signalData_shuffled.transpose(0, 2, 1)
 
-    return signalData_shuffled_flat, oneHotLabels_shuffled
+    return signalData_shuffled_flat, oneHotLabels_shuffled, modTypes
 
 
 def load_data_conv(fname, scaler=None):
     '''  Load dataset from pickled file '''
 
-    signalData_shuffled, oneHotLabels_shuffled = __load(fname)
+    signalData_shuffled, oneHotLabels_shuffled, modTypes = __load(fname)
 
-    return signalData_shuffled, oneHotLabels_shuffled
+    return signalData_shuffled, oneHotLabels_shuffled, modTypes

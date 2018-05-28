@@ -72,7 +72,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
         for f in filenames:
             print('Loading: ' + f)
             sys.stdout.flush()
-            temp_data, temp_one_hot = loader(f, scaler)
+            temp_data, temp_one_hot, labels = loader(f, scaler)
             if train_count is not None:
                 temp_data = temp_data[:train_count, :]
                 temp_one_hot = temp_one_hot[:train_count, :]
@@ -95,9 +95,9 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
         print('Loading: ' + f)
         sys.stdout.flush()
         if train_shuffled_data_flat is None:
-            train_shuffled_data_flat, train_shuffled_one_hot = loader(f, scaler)
+            train_shuffled_data_flat, train_shuffled_one_hot, _ = loader(f, scaler)
         else:
-            temp_data, temp_one_hot = loader(f, scaler)
+            temp_data, temp_one_hot, labels = loader(f, scaler)
             train_shuffled_data_flat = numpy.concatenate((train_shuffled_data_flat, temp_data), axis=0)
             train_shuffled_one_hot = numpy.concatenate((train_shuffled_one_hot, temp_one_hot), axis=0)
     if train_count is not None:
@@ -130,7 +130,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
                 acc.append(metrics[1])
                 k.append(metrics[2])
                 scores = model.evaluate(train_shuffled_data_flat, train_shuffled_one_hot)
-                report = classification_report(numpy.argmax(train_shuffled_one_hot, axis=1), model.predict_classes(train_shuffled_data_flat))
+                report = classification_report(numpy.argmax(train_shuffled_one_hot, axis=1), model.predict_classes(train_shuffled_data_flat), labels=labels)
                 print(report)
                 class_rep.append(report)
                 ev.append(list(scores))
@@ -186,7 +186,7 @@ def plot(loss, acc, ev, k, time, uuid):
     plt.ylabel('Loss')
     plt.xlabel('Batch')
     plt.legend(['train'], loc='upper left')
-    plt.savefig('{date:%Y-%m-%d %H:%M:%S}-loss-{uuid}.png'.format(uuid=uuid, date=time))
+    plt.savefig('{date:%Y-%m-%d_%H:%M:%S}-loss-{uuid}.png'.format(uuid=uuid, date=time))
     plt.clf()
     plt.plot(acc)
     plt.plot(k)
@@ -194,7 +194,7 @@ def plot(loss, acc, ev, k, time, uuid):
     plt.ylabel('Accuracy')
     plt.xlabel('Batch')
     plt.legend(['train', 'top_2'], loc='upper left')
-    plt.savefig('{date:%Y-%m-%d %H:%M:%S}-acc-{uuid}.png'.format(uuid=uuid, date=time))
+    plt.savefig('{date:%Y-%m-%d_%H:%M:%S}-acc-{uuid}.png'.format(uuid=uuid, date=time))
     plt.clf()
     plt.plot(ev[:, 1])
     plt.plot(ev[:, 2])
@@ -202,7 +202,7 @@ def plot(loss, acc, ev, k, time, uuid):
     plt.ylabel('Accuracy')
     plt.xlabel('Batch')
     plt.legend(['train'], loc='upper left')
-    plt.savefig('{date:%Y-%m-%d %H:%M:%S}-eval-{uuid}.png'.format(uuid=uuid, date=time))
+    plt.savefig('{date:%Y-%m-%d_%H:%M:%S}-eval-{uuid}.png'.format(uuid=uuid, date=time))
 
 
 if __name__ == '__main__':
