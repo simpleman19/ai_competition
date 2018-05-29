@@ -31,7 +31,7 @@ def predict(model_file, test_data, test_labels, count=None):
     else:
         prediction = model.predict_classes(test_data[:count])
     numpy.savetxt('predictions.csv', prediction, delimiter=',')
-    numpy.savetxt('actuals.csv', test_labels, delimiter=',')
+    numpy.savetxt('actuals.csv', numpy.argmax(test_labels, axis=1), delimiter=',')
 
 
 if __name__ == '__main__':

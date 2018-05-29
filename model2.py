@@ -32,7 +32,7 @@ def compile_model():
     model.add(PReLU())
     model.add(Dropout(.1))
     model.add(Dense(24, activation='softmax'))
-    adam = Adam(lr=.0005, beta_1=.9, beta_2=.98, decay=0, amsgrad=True)
+    adam = Adam(lr=.0005, beta_1=.9, beta_2=.98, decay=0.00001, amsgrad=True)
     model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy', top_2])
     # scaler = Scaler(preprocessing.Normalizer())
     return model, scaler
