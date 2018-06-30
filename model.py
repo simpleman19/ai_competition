@@ -4,6 +4,7 @@ from keras.backend import relu
 from keras.optimizers import Adam, SGD
 from keras.metrics import top_k_categorical_accuracy
 from sklearn import preprocessing
+from load_data import load_data
 
 
 def top_2(y_true, y_pred):
