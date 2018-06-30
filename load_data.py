@@ -115,6 +115,45 @@ def load_data_conv(fname, scaler=None):
     return signal_shuffled, one_hot_shuffled, modTypes
 
 
+def load_data_sub(fname, scaler=None):
+    '''  Load dataset from pickled file '''
+
+    signal_shuffled, one_hot_shuffled, modTypes = __load(fname)
+
+    if scaler is not None:
+        signal_shuffled = scaler.fit_transform(signal_shuffled.reshape(signal_shuffled.shape[0], 2048))
+    else:
+        signal_shuffled = signal_shuffled.reshape(signal_shuffled.shape[0], 2048)
+
+    x = list(one_hot_shuffled.shape)[0]
+    new_one_hot = np.zeros((x, 6))
+    for x in range(len(one_hot_shuffled)):
+        new_one_hot[x] = subset(one_hot_shuffled[x])
+
+    gc.collect()
+
+    return signal_shuffled, new_one_hot, modTypes
+
+
+def subset(row):
+    return_row = np.array([0, 0, 0, 0, 0, 0])
+    # 1 4 9 11 22
+    if row[1] == 1:
+        return_row[1] = 1
+    elif row[4] == 1:
+        return_row[2] = 1
+    elif row[9] == 1:
+        return_row[3] = 1
+    elif row[11] == 1:
+        return_row[4] = 1
+    elif row[22] == 1:
+        return_row[5] = 1
+    else:
+        return_row[0] = 1
+
+    return return_row
+
+
 def shuffle_in_place(data, one_hots):
     num_to_shuffle = len(data)
     shuffle_args = np.arange(0, num_to_shuffle)

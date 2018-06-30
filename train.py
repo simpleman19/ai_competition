@@ -1,6 +1,6 @@
 import matplotlib
 matplotlib.use('Agg')
-from model2 import compile_model, load_data
+from model_sub import compile_model, load_data
 from load_data import shuffle_in_place
 import numpy
 import math
@@ -26,8 +26,7 @@ class Tee(object):
             f.flush()
 
 
-def train_model(filenames, train_names, batch_size, epochs, file_iterations, loader, train_count=None, uuid=None, load=False, model_file=None):
-
+def train_model(filenames, train_names, batch_size, epochs, file_iterations, loader, train_count=None, uuid=None, load=False, model_file=None, save=False):
     # Variable initialization
     session = tf.Session(config=tf.ConfigProto(log_device_placement=True))
     session = None
@@ -163,7 +162,8 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
                 print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
 
                 # Save progress to file incase interrupted
-                model_file = save_progress(**locals())
+                if save:
+                    model_file = save_progress(**locals())
                 shuffle_in_place(train_shuffled_data_flat, train_shuffled_one_hot)
             # Restart epochs
             e_start = 0
@@ -179,6 +179,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
     os.remove(training_file_name)
     # Plot everything to files
     plot(loss, acc, numpy.asarray(ev), k, time, uuid)
+    sys.stdout.flush()
 
 
 def print_metrics(step, total, model, metrics, scores, e, f):
@@ -257,13 +258,15 @@ if __name__ == '__main__':
         'rf_data/training_data_chunk_14.pkl',
     ]
     train_count = None
-    iters = 8
+    iters = 5
+    save = True
 
     # Modifications to test on laptop
     if os.uname()[1] == 'laptop':
         files = ['rf_data/training_data_chunk_0.pkl', 'rf_data/training_data_chunk_1.pkl']
-        train_count = 5000
+        train_count = 10000
         iters = 2
+        save = False
 
     # get uuid
     uuid = None
@@ -288,5 +291,4 @@ if __name__ == '__main__':
     # Train with log and tee output
     with open(uuid + '.log', 'a') as f:
         sys.stdout = Tee(sys.stdout, f)
-        train_model(files, train_names, 512, 1, iters, load_data, uuid=uuid, load=True, model_file=model_file, train_count=train_count)
-    # train_conv(files, train_names, 512, 1, 1, uuid=uuid, evaluate=False, train_count=100000)
+        train_model(files, train_names, 512, 1, iters, load_data, uuid=uuid, load=True, model_file=model_file, train_count=train_count, save=save)

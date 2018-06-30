@@ -1,6 +1,6 @@
 import matplotlib
 matplotlib.use('Agg')
-from model2 import compile_model, load_data
+from model import compile_model, load_data
 import numpy
 import math
 import sys
