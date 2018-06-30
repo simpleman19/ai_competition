@@ -1,6 +1,7 @@
 import matplotlib
 matplotlib.use('Agg')
 from model2 import compile_model, load_data
+from load_data import shuffle_in_place
 import numpy
 import math
 import sys
@@ -26,6 +27,8 @@ class Tee(object):
 
 
 def train_model(filenames, train_names, batch_size, epochs, file_iterations, loader, train_count=None, uuid=None, load=False, model_file=None):
+
+    # Variable initialization
     session = tf.Session(config=tf.ConfigProto(log_device_placement=True))
     session = None
     model, scaler = compile_model()
@@ -48,12 +51,19 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
     e_end = epochs
     f_start = 0
     f_end = file_iterations
+
+    # Determine how many vals to use
     if train_count is None:
         num_of_vals = 288000
     else:
         num_of_vals = train_count
+
+    # Get time for timestamp
     time = datetime.datetime.now()
+    # Seed scores
     scores = (0, 0, 0)
+
+    # Check if should load a existing model to continue training
     if os.path.isfile(training_file_name):
         with open(training_file_name, 'r') as f:
             tmp = f.readline()
@@ -64,8 +74,10 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
         k = numpy.load(k_array_fname + '.npy').tolist()
         class_rep = numpy.load(class_array_fname + 'npy').tolist()
         model.load_weights(model_file_tmp)
-    elif model_file is not None:
+    elif model_file is not None:  # If not continueing but loading model
         model.load_weights(model_file)
+
+    # If preload all data flag is set else load data at each iteration
     if load:
         count = 0
         print('Loading on startup...')
@@ -91,6 +103,8 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
             count += 1
             gc.collect()
         filenames = ['Loaded_On_Startup']
+
+    # Always preload training data
     for f in train_names:
         print('Loading: ' + f)
         sys.stdout.flush()
@@ -100,12 +114,19 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
             temp_data, temp_one_hot, labels = loader(f, scaler)
             train_shuffled_data_flat = numpy.concatenate((train_shuffled_data_flat, temp_data), axis=0)
             train_shuffled_one_hot = numpy.concatenate((train_shuffled_one_hot, temp_one_hot), axis=0)
+
+    # If only using part of the training data
     if train_count is not None:
         train_shuffled_data_flat = train_shuffled_data_flat[:train_count, :]
         train_shuffled_one_hot = train_shuffled_one_hot[:train_count, :]
+
+    # Free some memory
     del temp_data, temp_one_hot
+
+    # Start iterations, loop through all files x times
     for f in range(int(f_start), int(f_end)):
         print('-- File Iteration {} --'.format(f + 1))
+        # loop through files if not preloaded, else will only run this loop once
         for file in filenames:
             print('-- New File {} --'.format(file))
             if not load:
@@ -113,9 +134,11 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
             if load:
                 train_count = len(shuffled_one_hot)
             batches = int(math.floor(train_count / batch_size))
+            # Epochs
             for e in range(int(e_start), int(e_end)):
                 print('Epoch {}/{}'.format(e+1, epochs))
                 sys.stdout.flush()
+                # Batches
                 for i in range(0, batches - 1):
                     metrics = model.train_on_batch(shuffled_data_flat[i*batch_size:(i+1)*batch_size, :],
                                                    shuffled_one_hot[i*batch_size:(i+1)*batch_size])
@@ -123,6 +146,8 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
                     loss.append(metrics[0])
                     acc.append(metrics[1])
                     k.append(metrics[2])
+
+                # Calc Metrics
                 metrics = model.train_on_batch(shuffled_data_flat[(batches-1) * batch_size:train_count, :],
                                                shuffled_one_hot[(batches-1) * batch_size:train_count])
                 print_metrics(train_count, train_count, model, metrics, scores, e+1, f+1)
@@ -136,15 +161,23 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
                 ev.append(list(scores))
                 print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
                 print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
+
+                # Save progress to file incase interrupted
                 model_file = save_progress(**locals())
+                shuffle_in_place(train_shuffled_data_flat, train_shuffled_one_hot)
+            # Restart epochs
             e_start = 0
+    # Get Final scores and save off all data needed
     scores = model.evaluate(train_shuffled_data_flat, train_shuffled_one_hot)
     model.save('{date:%Y-%m-%d_%H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=uuid, date=time, score=scores[1] * 100))
     print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
     print("%s: %.2f%%" % (model.metrics_names[2], scores[2] * 100))
+    # Print class specific data
     for cr in class_rep:
         print(cr)
+    # Remove train file to prove done
     os.remove(training_file_name)
+    # Plot everything to files
     plot(loss, acc, numpy.asarray(ev), k, time, uuid)
 
 
@@ -224,7 +257,7 @@ if __name__ == '__main__':
         'rf_data/training_data_chunk_14.pkl',
     ]
     train_count = None
-    iters = 10
+    iters = 8
 
     # Modifications to test on laptop
     if os.uname()[1] == 'laptop':

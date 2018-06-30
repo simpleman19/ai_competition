@@ -2,6 +2,7 @@ import pickle
 import numpy as np
 from sklearn import preprocessing
 import gc
+import math
 
 
 def __load(fname):
@@ -109,6 +110,23 @@ def load_data_lstm(fname, scaler=None):
 def load_data_conv(fname, scaler=None):
     '''  Load dataset from pickled file '''
 
-    signalData_shuffled, oneHotLabels_shuffled, modTypes = __load(fname)
+    signal_shuffled, one_hot_shuffled, modTypes = __load(fname)
 
-    return signalData_shuffled, oneHotLabels_shuffled, modTypes
+    return signal_shuffled, one_hot_shuffled, modTypes
+
+
+def shuffle_in_place(data, one_hots):
+    num_to_shuffle = len(data)
+    shuffle_args = np.arange(0, num_to_shuffle)
+    np.random.shuffle(shuffle_args)
+    num_to_shuffle -= 1
+
+    for x in range(int(math.floor(num_to_shuffle/2))):
+        # Signal
+        temp = data[shuffle_args[x]]
+        data[shuffle_args[x]] = data[shuffle_args[num_to_shuffle - x]]
+        data[shuffle_args[num_to_shuffle - x]] = temp
+        # One Hot
+        temp = one_hots[shuffle_args[x]]
+        one_hots[shuffle_args[x]] = one_hots[shuffle_args[num_to_shuffle - x]]
+        one_hots[shuffle_args[num_to_shuffle - x]] = temp
