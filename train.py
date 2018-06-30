@@ -1,6 +1,6 @@
 import matplotlib
 matplotlib.use('Agg')
-from model import compile_model, load_data
+from model_sub import compile_model, load_data
 from load_data import shuffle_in_place
 import numpy
 import math
@@ -259,7 +259,7 @@ if __name__ == '__main__':
         'rf_data/training_data_chunk_14.pkl',
     ]
     train_count = None
-    iters = 8
+    iters = 4
     save = True
 
     # Modifications to test on laptop
