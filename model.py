@@ -28,12 +28,9 @@ def compile_model():
     model.add(Dropout(.1))
     model.add(Dense(12288, activation='linear'))
     model.add(PReLU())
-    model.add(Dropout(.2))
-    model.add(Dense(8192, activation='linear'))
-    model.add(PReLU())
     model.add(Dropout(.1))
     model.add(Dense(24, activation='softmax'))
-    adam = Adam(lr=.0006, beta_1=.9, beta_2=.98, decay=0, amsgrad=True)
+    adam = Adam(lr=.0005, beta_1=.9, beta_2=.95, decay=0, amsgrad=True)
     model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy', top_2])
     # scaler = preprocessing.MinMaxScaler(feature_range=(-1, 1))
     return model, scaler

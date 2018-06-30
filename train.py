@@ -164,6 +164,7 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
                 # Save progress to file incase interrupted
                 if save:
                     model_file = save_progress(**locals())
+                print("Shuffling array")
                 shuffle_in_place(train_shuffled_data_flat, train_shuffled_one_hot)
             # Restart epochs
             e_start = 0
