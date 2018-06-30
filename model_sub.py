@@ -21,13 +21,13 @@ def compile_model():
                     ))
     model.add(PReLU())
     model.add(Dropout(.1))
-    model.add(Dense(12288, activation='linear'))
+    model.add(Dense(8192, activation='linear'))
     model.add(PReLU())
     model.add(Dropout(.1))
     model.add(Dense(8192, activation='sigmoid'))
     model.add(Dense(6, activation='softmax'))
     adam = Adam(lr=.00025, beta_1=.9, beta_2=.9, decay=0, amsgrad=True)
-    model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy', top_2])
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', top_2])
     return model, scaler
 
 
