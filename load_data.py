@@ -5,7 +5,7 @@ import gc
 import math
 
 
-def __load(fname):
+def __load(fname, shuffled=True):
     TAG = "-"
     # load data from files
     with open(fname, 'rb') as f:
@@ -69,23 +69,65 @@ def __load(fname):
     # Shuffle data
     print(TAG + "Shuffling Data...")
     """ signalData_shuffled, signalLabels_shuffled, oneHotLabels_shuffled """
-    # Randomly shuffle data, use predictable seed
-    np.random.seed(221)
-    shuffle_indices = np.random.permutation(np.arange(len(oneHotLabels)))
-    signalData_shuffled = signalData[shuffle_indices]
-    del signalData
-    # signalLabels_shuffled = signalLabels[shuffle_indices]
-    # del signalLabels
-    oneHotLabels_shuffled = oneHotLabels[shuffle_indices]
-    del oneHotLabels
+    if shuffled:
+        # Randomly shuffle data, use predictable seed
+        np.random.seed(221)
+        shuffle_indices = np.random.permutation(np.arange(len(oneHotLabels)))
+        signalData_shuffled = signalData[shuffle_indices]
+        del signalData
+        # signalLabels_shuffled = signalLabels[shuffle_indices]
+        # del signalLabels
+        oneHotLabels_shuffled = oneHotLabels[shuffle_indices]
+        del oneHotLabels
 
-    return signalData_shuffled, oneHotLabels_shuffled, modTypes
+        return signalData_shuffled, oneHotLabels_shuffled, modTypes
+    else:
+        return signalData, oneHotLabels, modTypes
 
 
-def load_data(fname, scaler=None):
+def load_act_data(fname, shuffled=True):
+    TAG = "-"
+    # load data from files
+    with open(fname, 'rb') as f:
+        dataCube = pickle.load(f, encoding='latin-1')
+        dataCubeKeyIndices = dataCube.keys()
+
+    # Count Number of examples
+    print(TAG + "Counting Number of Examples in Dataset...")
+    number_of_examples = len(dataCube)
+
+    print(TAG + 'Number of Examples in Dataset: ' + str(number_of_examples))
+
+    # pre-allocate arrays
+    signalData = [None] * number_of_examples
+    index = [None] * number_of_examples
+    # signalLabels = [None] * number_of_examples
+
+    # for each mod type ... for each snr value ... add to signalData, signalLabels, and create one-Hot vectors
+    example_index = 0
+    instance_shape = None
+
+    for key in dataCubeKeyIndices:
+        signalData[example_index] = dataCube[key]
+        # signalLabels[example_index] = (modType, snrValue)
+        index[example_index] = key
+        example_index += 1
+
+        if instance_shape is None:
+            instance_shape = np.shape(dataCube[key])
+
+    # convert to np.arrays
+    print(TAG + "Converting to numpy arrays...")
+    signalData = np.asarray(signalData, dtype=np.float32)
+    index = np.asarray(index, dtype=np.float32)
+
+    return dataCube
+
+
+def load_data(fname, scaler=None, shuffled=True):
     '''  Load dataset from pickled file '''
 
-    signalData_shuffled, oneHotLabels_shuffled, modTypes = __load(fname)
+    signalData_shuffled, oneHotLabels_shuffled, modTypes = __load(fname, shuffled)
 
     if scaler is not None:
         signalData_shuffled = scaler.fit_transform(signalData_shuffled.reshape(signalData_shuffled.shape[0], 2048))
@@ -97,28 +139,28 @@ def load_data(fname, scaler=None):
     return signalData_shuffled, oneHotLabels_shuffled, modTypes
 
 
-def load_data_lstm(fname, scaler=None):
+def load_data_lstm(fname, scaler=None, shuffled=True):
     '''  Load dataset from pickled file '''
 
-    signalData_shuffled, oneHotLabels_shuffled, modTypes = __load(fname)
+    signalData_shuffled, oneHotLabels_shuffled, modTypes = __load(fname, shuffled)
 
     signalData_shuffled_flat = signalData_shuffled.transpose(0, 2, 1)
 
     return signalData_shuffled_flat, oneHotLabels_shuffled, modTypes
 
 
-def load_data_conv(fname, scaler=None):
+def load_data_conv(fname, scaler=None, shuffled=True):
     '''  Load dataset from pickled file '''
 
-    signal_shuffled, one_hot_shuffled, modTypes = __load(fname)
+    signal_shuffled, one_hot_shuffled, modTypes = __load(fname, shuffled)
 
     return signal_shuffled, one_hot_shuffled, modTypes
 
 
-def load_data_sub(fname, scaler=None):
+def load_data_sub(fname, scaler=None, shuffled=True):
     '''  Load dataset from pickled file '''
 
-    signal_shuffled, one_hot_shuffled, modTypes = __load(fname)
+    signal_shuffled, one_hot_shuffled, modTypes = __load(fname, shuffled)
 
     if scaler is not None:
         signal_shuffled = scaler.fit_transform(signal_shuffled.reshape(signal_shuffled.shape[0], 2048))

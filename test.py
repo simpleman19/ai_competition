@@ -35,6 +35,6 @@ def predict(model_file, test_data, test_labels, count=None):
 
 
 if __name__ == '__main__':
-    shuffled_data_flat, shuffled_one_hot, types = load_data('rf_data/training_data_chunk_14.pkl')
-    predict("archive/2018-05-28_02:56:46-1f297724-2c05-4d34-ba37-f1db193b1512-62.9962.h5",
+    shuffled_data_flat, shuffled_one_hot, types = load_data('rf_data/training_data_chunk_14.pkl', shuffled=False)
+    test("archive/2018-05-28_15:59:39-b5823df9-5f3f-4b14-9922-94194b3c5131-69.0288.h5",
             shuffled_data_flat, shuffled_one_hot)
