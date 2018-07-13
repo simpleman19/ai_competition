@@ -35,6 +35,21 @@ def predict(model_file, test_data, test_labels, count=None):
 
 
 if __name__ == '__main__':
-    shuffled_data_flat, shuffled_one_hot, types = load_data('rf_data/training_data_chunk_14.pkl', shuffled=False)
-    test("archive/2018-05-28_15:59:39-b5823df9-5f3f-4b14-9922-94194b3c5131-69.0288.h5",
-            shuffled_data_flat, shuffled_one_hot)
+    files = ['rf_data/training_data_chunk_0.pkl',
+             'rf_data/training_data_chunk_1.pkl',
+             'rf_data/training_data_chunk_2.pkl',
+             'rf_data/training_data_chunk_3.pkl',
+             'rf_data/training_data_chunk_4.pkl',
+             'rf_data/training_data_chunk_5.pkl',
+             'rf_data/training_data_chunk_6.pkl',
+             'rf_data/training_data_chunk_7.pkl',
+             'rf_data/training_data_chunk_8.pkl',
+             'rf_data/training_data_chunk_10.pkl',
+             'rf_data/training_data_chunk_11.pkl',
+             'rf_data/training_data_chunk_12.pkl',
+             'rf_data/training_data_chunk_13.pkl',
+             'rf_data/training_data_chunk_14.pkl',
+             ]
+    for f in files:
+        shuffled_data_flat, shuffled_one_hot, types = load_data(f, shuffled=False)
+    test("archive/2018-05-28_15:59:39-b5823df9-5f3f-4b14-9922-94194b3c5131-69.0288.h5", shuffled_data_flat, shuffled_one_hot)

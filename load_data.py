@@ -40,6 +40,10 @@ def __load(fname, shuffled=True):
     one_hot_index = 0
     instance_shape = None
 
+    with open('loads', 'a') as f:
+        line = ",".join(map(str, modTypes))
+        f.write(line + "\n")
+
     for modType in modTypes:
         print(TAG + "[Modulation Dataset] Adding Collects for: " + str(modType))
         for snrValue in snrValues:
