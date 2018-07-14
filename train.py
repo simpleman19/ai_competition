@@ -255,8 +255,10 @@ if __name__ == '__main__':
              'rf_data/training_data_chunk_11.pkl',
              'rf_data/training_data_chunk_12.pkl',
              'rf_data/training_data_chunk_13.pkl',
+             'rf_data/training_data_chunk_14.pkl',
              ]
     train_names = [
+        'rf_data/training_data_chunk_4.pkl',
         'rf_data/training_data_chunk_14.pkl',
     ]
     train_count = None
