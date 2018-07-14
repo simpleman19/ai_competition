@@ -184,11 +184,12 @@ def train_model(filenames, train_names, batch_size, epochs, file_iterations, loa
 
 
 def print_metrics(step, total, model, metrics, scores, e, f):
-    print(('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f} - {:5s} {:1.4f}' +
+    print(('{:6d} / {:6d} - {:5s} {:1.4f} - {:5s} {:1.4f} - {:5s} {:1.4f} - {:5s} {:1.4f}' +
            ' - {:7s} {:1.4f} - {:7s} {:1.4f} - {:8s} {:1.4f}' +
            ' - epoch {} - iter {}').format(step,
                                            total,
                                            model.metrics_names[0], metrics[0],
+                                           'score', 100/(1+metrics[0]),
                                            model.metrics_names[1], metrics[1],
                                            model.metrics_names[2], metrics[2],
                                            'lst los', scores[0],
@@ -202,7 +203,7 @@ def save_progress(**l):
     if l['model_file'] is not None:
         os.remove(l['model_file'])
     model_file = '{date:%Y-%m-%d_%H:%M:%S}-{uuid}-{score:1.4f}.h5'.format(uuid=l['uuid'], date=l['time'],
-                                                                          score=l['scores'][1] * 100)
+                                                                          score=(100/(1+l['scores'][0])))
     l['model'].save(model_file)
     with open(l['training_file_name'], 'w') as file:
         file.write("{},{},{},{},{},{}".format(l['e'] + 1, l['e_end'], l['f'], l['f_end'], model_file, l['uuid']))

@@ -31,6 +31,7 @@ train_list
 *.temp
 *.tmp
 *.npy
+**/*.csv
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

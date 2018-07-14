@@ -13,7 +13,6 @@ def predict(model_, test_data, name):
             line = str(key) + ","
             line += ",".join(map(str, prediction[0]))
             f.write(line + "\n")
-    # numpy.savetxt('predictions.csv', prediction, delimiter=',', fmt="%1.4f")
 
 
 def split_dict(dictionary, count):
@@ -44,7 +43,7 @@ def multi_threaded():
 def single_threaded():
     date_flat = load_act_data('rf_data/Test_Set_1_Army_Signal_Challenge.pkl', shuffled=False)
     model, _ = compile_model()
-    model.load_weights("archive/b5823df9-5f3f-4b14-9922-94194b3c5131-69.0288.h5")
+    model.load_weights("archive/c077a9f1-f879-4587-a9f8-e858de2d9521-66.9267.h5")
     predict(model, date_flat, 'predictions.csv')
 
 
