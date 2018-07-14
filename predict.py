@@ -33,7 +33,7 @@ def multi_threaded():
     thread_pointers = threads * [None]
     for i in range(threads):
         model, _ = compile_model()
-        model.load_weights("archive/2018-05-28_15:59:39-b5823df9-5f3f-4b14-9922-94194b3c5131-69.0288.h5")
+        model.load_weights("archive/b5823df9-5f3f-4b14-9922-94194b3c5131-69.0288.h5")
         thread_pointers[i] = threading.Thread(target=predict, args=(model, dicts[i], 'predictions{}.csv'.format(i)))
         print("Starting thread " + str(i))
         thread_pointers[i].start()
@@ -44,7 +44,7 @@ def multi_threaded():
 def single_threaded():
     date_flat = load_act_data('rf_data/Test_Set_1_Army_Signal_Challenge.pkl', shuffled=False)
     model, _ = compile_model()
-    model.load_weights("archive/2018-05-28_15:59:39-b5823df9-5f3f-4b14-9922-94194b3c5131-69.0288.h5")
+    model.load_weights("archive/b5823df9-5f3f-4b14-9922-94194b3c5131-69.0288.h5")
     predict(model, date_flat, 'predictions.csv')
 
 

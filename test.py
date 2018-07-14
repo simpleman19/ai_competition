@@ -52,4 +52,4 @@ if __name__ == '__main__':
              ]
     for f in files:
         shuffled_data_flat, shuffled_one_hot, types = load_data(f, shuffled=False)
-    test("archive/2018-05-28_15:59:39-b5823df9-5f3f-4b14-9922-94194b3c5131-69.0288.h5", shuffled_data_flat, shuffled_one_hot)
+        test("archive/b5823df9-5f3f-4b14-9922-94194b3c5131-69.0288.h5", shuffled_data_flat, shuffled_one_hot)
