@@ -59,7 +59,7 @@ def multi_threaded():
 def single_threaded():
     date_flat = load_act_data('rf_data/Test_Set_1_Army_Signal_Challenge.pkl', shuffled=False)
     model, _ = compile_model()
-    model.load_weights("archive/c17ce34f-55fd-4cc5-b3c1-bb9bc9d519c7-59.3368.h5")
+    model.load_weights("archive/bdde9b04-bc8d-41f8-acfb-9965936ffbd4-68.2564.h5")
     predict(model, date_flat, 'predictions.csv')
 
 
