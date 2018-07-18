@@ -262,7 +262,7 @@ if __name__ == '__main__':
         'rf_data/training_data_chunk_14.pkl',
     ]
     train_count = None
-    iters = 16
+    iters = 24
     save = True
 
     # Modifications to test on laptop
