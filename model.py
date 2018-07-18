@@ -22,7 +22,6 @@ def compile_model():
                     input_dim=2048,
                     activation='linear'
                     ))
-    model.add(PReLU())
     model.add(Dense(16384, activation='linear'))
     model.add(PReLU())
     model.add(Dense(8192, activation='softplus'))
